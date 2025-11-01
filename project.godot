@@ -11,5 +11,9 @@ config_version=5
 [application]
 
 config/name="Infinite Gambit"
-run/main_scene="uid://h6gh84l3l6v7"
+run/main_scene="uid://bkccyfijc4rfp"
 config/features=PackedStringArray("4.4", "Forward Plus")
+
+[autoload]
+
+Game="*res://engine/game_manager.gd"

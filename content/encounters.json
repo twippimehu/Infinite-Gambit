@@ -1,0 +1,32 @@
+[
+  {
+	"name": "Aggressive",
+	"pieces": ["N","Q","B","R","K","R","Q","N"],
+	"difficulty": 2
+  },
+  {
+	"name": "Randomized",
+	"pieces": ["Q","N","R","K","B","Q","R","B"],
+	"difficulty": 3
+  },
+  {
+	"name": "Training",
+	"difficulty": 1,
+	"pieces": ["R","N","B","Q","K","B","N","R"]
+  },
+  {
+	"name": "Intermediate",
+	"difficulty": 2,
+	"pieces": ["R","N","B","Q","K","Q","B","R"]
+  },
+  {
+	"name": "Veteran",
+	"difficulty": 3,
+	"pieces": ["R","Q","B","K","B","Q","N","R"]
+  },
+  {
+	"name": "Elite",
+	"difficulty": 4,
+	"pieces": ["Q","R","B","K","Q","B","R","N"]
+  }
+]

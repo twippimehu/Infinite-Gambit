@@ -1,0 +1,39 @@
+[
+  {
+	"id": "gold_5",
+	"name": "+5 Gold",
+	"desc": "Gain 5 gold immediately.",
+	"type": "gold",
+	"amount": 5,
+	"rarity": 1
+  },
+  {
+	"id": "gold_10",
+	"name": "+10 Gold",
+	"desc": "Gain 10 gold immediately.",
+	"type": "gold",
+	"amount": 10,
+	"rarity": 2
+  },
+  {
+	"id": "extra_queen",
+	"name": "Royal Expansion",
+	"desc": "Start future battles with one bonus queen in a random slot.",
+	"type": "passive",
+	"rarity": 3
+  },
+  {
+	"id": "pawn_boost",
+	"name": "Rapid Pawns",
+	"desc": "Your pawns move 3 on their first turn for the rest of the run.",
+	"type": "passive",
+	"rarity": 2
+  },
+  {
+	"id": "discount",
+	"name": "Merchant’s Favor",
+	"desc": "Reduce reroll cost permanently.",
+	"type": "reroll_discount",
+	"rarity": 2
+  }
+]
