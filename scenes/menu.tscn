@@ -1,6 +1,21 @@
-[gd_scene load_steps=2 format=3 uid="uid://bkccyfijc4rfp"]
+[gd_scene load_steps=4 format=3 uid="uid://bkccyfijc4rfp"]
 
 [ext_resource type="Script" uid="uid://dbbgiv805s14j" path="res://scenes/menu.gd" id="1_yqeox"]
+[ext_resource type="FontFile" uid="uid://cckircs02opgx" path="res://assets/fonts/Exo2-SemiBold.ttf" id="2_vjb58"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_con2f"]
+bg_color = Color(0.20871, 0.20871, 0.20871, 1)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.147672, 0.147672, 0.147672, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 6
+shadow_offset = Vector2(4, 4)
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -11,8 +26,36 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_yqeox")
 
+[node name="Panel" type="Panel" parent="."]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_con2f")
+
 [node name="Button" type="Button" parent="."]
-layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_vjb58")
+theme_override_font_sizes/font_size = 35
 text = "New Run"

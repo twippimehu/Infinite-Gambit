@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://hv0hh8h16125"]
+[gd_scene load_steps=6 format=3 uid="uid://hv0hh8h16125"]
 
 [ext_resource type="Script" uid="uid://p6b3p16mfxt" path="res://scenes/draft.gd" id="1_abqjp"]
 [ext_resource type="FontFile" uid="uid://cckircs02opgx" path="res://assets/fonts/Exo2-SemiBold.ttf" id="2_700tk"]
@@ -14,6 +14,27 @@ corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
+
+[sub_resource type="GDScript" id="GDScript_abqjp"]
+script/source = "extends Button
+func _ready():
+	print(name, \"ready\")
+	pressed.connect(func(): print(name, \"pressed\"))
+"
+
+[sub_resource type="GDScript" id="GDScript_700tk"]
+script/source = "extends Button
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
 
 [node name="Draft" type="Control"]
 layout_mode = 3
@@ -63,6 +84,7 @@ offset_right = 45.0
 offset_bottom = 24.5
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 0
 theme_override_constants/separation = 12
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer"]
@@ -74,11 +96,13 @@ text = "          BUILD YOUR FIRST RANK"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
+mouse_filter = 0
 
 [node name="Slot0" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 text = "—"
+script = SubResource("GDScript_abqjp")
 
 [node name="Slot1" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
@@ -121,6 +145,7 @@ layout_mode = 2
 [node name="BtnPawn" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 text = "Pawn (1)"
+script = SubResource("GDScript_700tk")
 
 [node name="BtnKnight" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
