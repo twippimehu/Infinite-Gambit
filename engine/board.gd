@@ -60,6 +60,15 @@ func _ready():
 			}
 	_spawn_all_pieces()
 	_update_status("White begins.")
+	_update_gold()
+
+
+func _update_gold() -> void:
+	if has_node("Panel/VBoxContainer/GoldLabel"):
+		var label := $Panel/VBoxContainer/GoldLabel
+		label.text = "Gold: %d" % Game.gold
+
+
 	# --- Apply upgrades that modify gameplay ---
 	if has_node("/root/Game"):
 		var upgrades: Array = Game.upgrades
@@ -85,15 +94,6 @@ func _ready():
 	_sfx["mate"].stream = sfx_mate
 
 	_setup_ui_buttons()
-	
-	# --- Apply enemy scaling from GameManager (stage-based) ---
-	if has_node("/root/GameManager"):
-		var gm = get_node("/root/GameManager")
-		var enemy_cfg = gm.get_current_enemy_cfg()
-	# Example hooks
-	# ai_depth = int(enemy_cfg["ai"]["depth"])
-	# ai_noise = float(enemy_cfg["ai"]["noise"])
-	# enemy_budget = int(enemy_cfg["budget"])
 
 # -------------------------------------------------------------------
 # Helpers
@@ -305,12 +305,23 @@ func _try_move(target: Vector2i):
 	var opponent := 1 - current_turn
 	var check_flag := _is_check(opponent)
 	var mate_flag := check_flag and not _has_legal_move(opponent)
+	var stale_flag := not check_flag and not _has_legal_move(opponent)
+
 	if mate_flag:
-		_update_status(("White" if current_turn == 0 else "Black") + " wins by checkmate!")
+		var winner := "White" if current_turn == 0 else "Black"
+		_update_status("%s wins by checkmate!" % winner)
 		_play_sfx("mate")
 		game_over = true
-		_on_game_over("white")
+		_on_game_over(winner.to_lower())
 		return
+
+	if stale_flag:
+		_update_status("Stalemate. Draw.")
+		game_over = true
+		_play_sfx("check") # or make a draw sound if available
+		_on_game_over("draw")
+		return
+
 
 	current_turn = opponent
 	if check_flag:
@@ -406,29 +417,31 @@ func _is_legal_move(src: Vector2i, dst: Vector2i, piece) -> bool:
 			var dir = 1 if piece.side == 0 else -1
 			var start_row = 1 if piece.side == 0 else 6
 			var enemy = 1 - piece.side
+			var max_push = 2
+
+			# Only white pawns get the triple push if player has upgrade
+			if piece.side == 0 and has_node("/root/Game") and "pawn_boost" in Game.upgrades:
+				max_push = 3
 
 			# forward moves
 			if dc == 0 and target == null:
-				# normal 1-step
 				if dr == dir:
 					return true
-				# boosted multi-step (2 or 3 depending on upgrade)
-				if not piece.has_moved and src.x == start_row:
-					var push_limit := state.extra_pawn_push
-					for step in range(2, push_limit + 1):
-						if dr == step * dir and state.board[src.x + dir * (step - 1)][src.y] == null:
-							return true
+				if dr == 2 * dir and src.x == start_row and state.board[src.x + dir][src.y] == null:
+					return true
+				if dr == 3 * dir and src.x == start_row and max_push == 3 \
+				and state.board[src.x + dir][src.y] == null and state.board[src.x + 2 * dir][src.y] == null:
+					return true
 
-			# diagonal captures
-			if dr == dir and abs(dc) == 1 and target != null and target.side == enemy:
-				return true
-
-			# en passant capture
-			if dr == dir and abs(dc) == 1 and target == null:
-				if Vector2i(dst.x, dst.y) == last_double_pawn:
+			# captures (including en passant)
+			if dr == dir and abs(dc) == 1:
+				if target != null and target.side == enemy:
+					return true
+				if target == null and Vector2i(dst.x, dst.y) == last_double_pawn:
 					return true
 
 			return false
+
 
 		"R":
 			if dr == 0 or dc == 0:
