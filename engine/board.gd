@@ -64,8 +64,8 @@ func _ready():
 
 
 func _update_gold() -> void:
-	if has_node("Panel/VBoxContainer/GoldLabel"):
-		var label := $Panel/VBoxContainer/GoldLabel
+	if has_node("Panel2/GoldLabel"):
+		var label: Label = $Panel2/GoldLabel
 		label.text = "Gold: %d" % Game.gold
 
 
