@@ -1,130 +1,138 @@
-[gd_scene load_steps=13 format=3 uid="uid://o5x8jw35pc5x"]
+[gd_scene load_steps=17 format=3 uid="uid://o5x8jw35pc5x"]
 
 [ext_resource type="Script" uid="uid://mna8no8tr4pb" path="res://engine/reward.gd" id="1_4vy62"]
+[ext_resource type="Shader" uid="uid://cwqte2t4hfrm3" path="res://scenes/menu.gdshader" id="2_01wlk"]
 [ext_resource type="FontFile" uid="uid://cckircs02opgx" path="res://assets/fonts/Exo2-SemiBold.ttf" id="2_msj68"]
+[ext_resource type="Texture2D" uid="uid://cy1offpt7c24l" path="res://assets/chess/vector-chess-pieces/Board Brown 72px.png" id="3_eu6ix"]
+[ext_resource type="Script" uid="uid://cvyfpb70mtfkn" path="res://scenes/background.gd" id="4_204uq"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_unrml"]
+shader = ExtResource("2_01wlk")
+shader_parameter/scroll = Vector2(-0.6, 0.3)
+shader_parameter/darken = 0.27
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ghuxa"]
-bg_color = Color(0.12549, 0.12549, 0.12549, 1)
+bg_color = Color(0.117647, 0.105882, 0.0980392, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.25098, 0.25098, 0.25098, 1)
+border_color = Color(0, 0, 0, 0.501961)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 shadow_color = Color(0, 0, 0, 0.4)
-shadow_size = 8
+shadow_size = 24
 shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_msj68"]
-bg_color = Color(0.239216, 0.239216, 0.239216, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.415686, 0.415686, 0.415686, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+bg_color = Color(0.290196, 0.172549, 0.0784314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.501961)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4vy62"]
-bg_color = Color(0.121569, 0.121569, 0.121569, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.439216, 0.439216, 0.439216, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+bg_color = Color(0.172549, 0.105882, 0.054902, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.501961)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6gis2"]
-bg_color = Color(0.188235, 0.188235, 0.188235, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.313726, 0.313726, 0.313726, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+bg_color = Color(0.235294, 0.137255, 0.0705882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.501961)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_204uq"]
-bg_color = Color(0.239216, 0.239216, 0.239216, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.415686, 0.415686, 0.415686, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+bg_color = Color(0.290196, 0.172549, 0.0784314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.501961)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_unrml"]
-bg_color = Color(0.121569, 0.121569, 0.121569, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
+bg_color = Color(0.172549, 0.105882, 0.054902, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color(0.415686, 0.415686, 0.415686, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alqe5"]
-bg_color = Color(0.188235, 0.188235, 0.188235, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.313726, 0.313726, 0.313726, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+bg_color = Color(0.235294, 0.137255, 0.0705882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.501961)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p7sb0"]
-bg_color = Color(0.239216, 0.239216, 0.239216, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.415686, 0.415686, 0.415686, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+bg_color = Color(0.290196, 0.172549, 0.0784314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.501961)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_01wlk"]
-bg_color = Color(0.121569, 0.121569, 0.121569, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.439216, 0.439216, 0.439216, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+bg_color = Color(0.172549, 0.105882, 0.054902, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.501961)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eu6ix"]
-bg_color = Color(0.188235, 0.188235, 0.188235, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.313726, 0.313726, 0.313726, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+bg_color = Color(0.235294, 0.137255, 0.0705882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.501961)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="Reward" type="Control"]
 layout_mode = 3
@@ -135,27 +143,34 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_4vy62")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
+modulate = Color(0.458405, 0.458405, 0.458405, 0.619608)
+texture_filter = 1
+material = SubResource("ShaderMaterial_unrml")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 38.0
+offset_bottom = 34.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.701961)
+texture = ExtResource("3_eu6ix")
+stretch_mode = 1
+script = ExtResource("4_204uq")
 
 [node name="Panel" type="Panel" parent="."]
-custom_minimum_size = Vector2(400, 300)
+custom_minimum_size = Vector2(520, 340)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -255.0
-offset_top = -170.0
-offset_right = 256.0
-offset_bottom = 159.0
+offset_left = -255.5
+offset_top = -164.5
+offset_right = 255.5
+offset_bottom = 164.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ghuxa")
@@ -174,19 +189,22 @@ offset_right = 175.5
 offset_bottom = 128.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 11
+theme_override_constants/separation = 16
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.909804, 0.690196, 1)
+theme_override_constants/outline_size = 10
 theme_override_fonts/font = ExtResource("2_msj68")
-theme_override_font_sizes/font_size = 26
-text = "        CHOOSE AN UPGRADE"
+theme_override_font_sizes/font_size = 29
+text = "     CHOOSE AN UPGRADE"
 
 [node name="Button" type="Button" parent="Panel/VBoxContainer"]
 custom_minimum_size = Vector2(320, 60)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.968627, 0.901961, 0.788235, 1)
 theme_override_fonts/font = ExtResource("2_msj68")
+theme_override_font_sizes/font_size = 20
 theme_override_styles/hover = SubResource("StyleBoxFlat_msj68")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_4vy62")
 theme_override_styles/normal = SubResource("StyleBoxFlat_6gis2")
@@ -195,9 +213,10 @@ text = "Extra queen after promotion"
 [node name="Button2" type="Button" parent="Panel/VBoxContainer"]
 custom_minimum_size = Vector2(320, 60)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.968627, 0.901961, 0.788235, 1)
 theme_override_constants/line_spacing = 0
 theme_override_fonts/font = ExtResource("2_msj68")
+theme_override_font_sizes/font_size = 20
 theme_override_styles/hover = SubResource("StyleBoxFlat_204uq")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_unrml")
 theme_override_styles/normal = SubResource("StyleBoxFlat_alqe5")
@@ -206,8 +225,9 @@ text = "Pawns move 3 on first turn"
 [node name="Button3" type="Button" parent="Panel/VBoxContainer"]
 custom_minimum_size = Vector2(320, 60)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.968627, 0.901961, 0.788235, 1)
 theme_override_fonts/font = ExtResource("2_msj68")
+theme_override_font_sizes/font_size = 20
 theme_override_styles/hover = SubResource("StyleBoxFlat_p7sb0")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_01wlk")
 theme_override_styles/normal = SubResource("StyleBoxFlat_eu6ix")

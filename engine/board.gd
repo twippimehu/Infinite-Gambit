@@ -64,9 +64,10 @@ func _ready():
 
 
 func _update_gold() -> void:
-	if has_node("Panel2/GoldLabel"):
-		var label: Label = $Panel2/GoldLabel
-		label.text = "Gold: %d" % Game.gold
+	if has_node("LeftPanel/VBox/Label_Gold"):
+		var label: Label = $LeftPanel/VBox/Label_Gold
+		label.text = "🪙 Gold: %d" % Game.gold
+
 
 
 	# --- Apply upgrades that modify gameplay ---

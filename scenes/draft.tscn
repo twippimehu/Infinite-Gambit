@@ -5,6 +5,7 @@
 [ext_resource type="Shader" uid="uid://cwqte2t4hfrm3" path="res://scenes/menu.gdshader" id="2_pjfeh"]
 [ext_resource type="Texture2D" uid="uid://cy1offpt7c24l" path="res://assets/chess/vector-chess-pieces/Board Brown 72px.png" id="3_5j11b"]
 [ext_resource type="Script" uid="uid://cvyfpb70mtfkn" path="res://scenes/background.gd" id="4_ktkuy"]
+[ext_resource type="StyleBox" uid="uid://krne7k7b6mlp" path="res://scenes/panel_dark.tres" id="5_vq1dt"]
 [ext_resource type="Texture2D" uid="uid://bckgocub4uyfc" path="res://assets/chess/vector-chess-pieces/White/Pawn White Outline 72px.png" id="6_bjw16"]
 [ext_resource type="Texture2D" uid="uid://cjlkadeye4lq8" path="res://assets/chess/vector-chess-pieces/White/Knight White 72px.png" id="7_8gl8e"]
 [ext_resource type="Texture2D" uid="uid://ybml04oumnj5" path="res://assets/chess/vector-chess-pieces/White/Bishop White Outline 72px.png" id="8_8gl8e"]
@@ -16,30 +17,6 @@
 shader = ExtResource("2_pjfeh")
 shader_parameter/scroll = Vector2(-0.6, 0.3)
 shader_parameter/darken = 0.27
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qgxk2"]
-content_margin_left = 40.0
-content_margin_top = 40.0
-content_margin_right = 40.0
-content_margin_bottom = 40.0
-bg_color = Color(0.117647, 0.105882, 0.0980392, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0, 0, 0.0156863, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-corner_detail = 15
-expand_margin_left = 45.0
-expand_margin_top = 40.0
-expand_margin_right = 40.0
-expand_margin_bottom = 64.0
-shadow_color = Color(0.176471, 0.156863, 0.145098, 1)
-shadow_size = 20
-shadow_offset = Vector2(0, 4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bjw16"]
 bg_color = Color(0.208948, 0.190239, 0.180885, 1)
@@ -237,7 +214,7 @@ offset_bottom = 175.0
 grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(0, 3)
-theme_override_styles/panel = SubResource("StyleBoxFlat_qgxk2")
+theme_override_styles/panel = ExtResource("5_vq1dt")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
 layout_mode = 1
