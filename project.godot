@@ -17,3 +17,7 @@ config/features=PackedStringArray("4.4", "Forward Plus")
 [autoload]
 
 Game="*res://engine/game_manager.gd"
+
+[display]
+
+window/stretch/mode="canvas_items"

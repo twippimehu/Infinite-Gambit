@@ -1,21 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://bkccyfijc4rfp"]
+[gd_scene load_steps=7 format=3 uid="uid://bkccyfijc4rfp"]
 
 [ext_resource type="Script" uid="uid://cwulut2e7hkxw" path="res://engine/menu.gd" id="1_vjb58"]
+[ext_resource type="Texture2D" uid="uid://cy1offpt7c24l" path="res://assets/chess/vector-chess-pieces/Board Brown 72px.png" id="2_mhnvy"]
 [ext_resource type="FontFile" uid="uid://cckircs02opgx" path="res://assets/fonts/Exo2-SemiBold.ttf" id="2_vjb58"]
+[ext_resource type="Script" uid="uid://cvyfpb70mtfkn" path="res://scenes/background.gd" id="3_4ytvr"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_con2f"]
-bg_color = Color(0.20871, 0.20871, 0.20871, 1)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 8
-border_color = Color(0.147672, 0.147672, 0.147672, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_size = 6
-shadow_offset = Vector2(4, 4)
+[sub_resource type="Animation" id="Animation_g3eks"]
+resource_name = "scroll"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_v86rl"]
+_data = {
+&"scroll": SubResource("Animation_g3eks")
+}
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -26,36 +22,87 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_vjb58")
 
-[node name="Panel" type="Panel" parent="."]
-custom_minimum_size = Vector2(200, 100)
+[node name="Background" type="TextureRect" parent="."]
+modulate = Color(0.458405, 0.458405, 0.458405, 0.619608)
+texture_filter = 1
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -50.0
-offset_right = 100.0
-offset_bottom = 50.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_con2f")
+texture = ExtResource("2_mhnvy")
+stretch_mode = 1
+script = ExtResource("3_4ytvr")
 
-[node name="NewRun" type="Button" parent="."]
-custom_minimum_size = Vector2(200, 100)
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Background"]
+libraries = {
+&"": SubResource("AnimationLibrary_v86rl")
+}
+
+[node name="TitleLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_top = 37.0
+offset_right = 181.0
+offset_bottom = 89.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.776471, 0.658824, 0.431373, 1)
+theme_override_fonts/font = ExtResource("2_vjb58")
+theme_override_font_sizes/font_size = 75
+text = "Infinite Gambit"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -50.0
-offset_right = 100.0
-offset_bottom = 50.0
+offset_left = -131.0
+offset_top = -63.5
+offset_right = 131.0
+offset_bottom = 63.5
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="NewRun" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(150, 80)
+layout_mode = 2
+theme_override_constants/line_spacing = 20
 theme_override_fonts/font = ExtResource("2_vjb58")
 theme_override_font_sizes/font_size = 35
 text = "New Run"
+
+[node name="BtnContinue" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/line_spacing = 20
+text = "Continue Run"
+
+[node name="BtnOptions" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/line_spacing = 20
+text = "Options"
+
+[node name="BtnQuit" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_constants/line_spacing = 20
+text = "Quit"
+
+[node name="VersionLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -72.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 24
+text = "v0.1.0"

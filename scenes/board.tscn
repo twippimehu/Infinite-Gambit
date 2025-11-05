@@ -27,6 +27,7 @@ script = ExtResource("1_tx6nw")
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="BoardSprite" type="Sprite2D" parent="."]
+texture_filter = 1
 texture = ExtResource("2_nglv8")
 
 [node name="UI" type="CanvasLayer" parent="."]

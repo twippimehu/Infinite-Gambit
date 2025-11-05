@@ -1,24 +1,37 @@
 extends Control
 
-@onready var btn_new_run: Button = $NewRun
+@onready var btn_new_run: Button = $VBoxContainer/NewRun
+@onready var btn_continue: Button = $VBoxContainer/BtnContinue
+@onready var btn_options: Button = $VBoxContainer/BtnOptions
+@onready var btn_quit: Button = $VBoxContainer/BtnQuit
+@onready var title_label: Label = $TitleLabel
 
 func _ready() -> void:
-	if btn_new_run:
-		btn_new_run.pressed.connect(_start_run)
-	else:
-		push_error("Button 'NewRun' not found in scene")
+	btn_new_run.pressed.connect(_on_new_run)
+	btn_continue.pressed.connect(_on_continue)
+	btn_options.pressed.connect(_on_options)
+	btn_quit.pressed.connect(_on_quit)
 
-func _start_run() -> void:
-	print("New Run clicked")
+	# Disable continue if no run active
+	btn_continue.disabled = not Game.run_active
+
+	# Title animation
+	var tween = create_tween()
+	title_label.modulate = Color(1, 1, 1, 0)
+	tween.tween_property(title_label, "modulate:a", 3.0, 3.0)
+
+func _on_new_run() -> void:
 	Game.start_new_run()
 
-	# Defer one frame to ensure we're inside the tree
-	call_deferred("_go_to_draft")
-	
+func _on_continue() -> void:
+	if Game.run_active:
+		Game.proceed_to_battle()
 
-func _go_to_draft() -> void:
-	var loop := Engine.get_main_loop()
-	if loop is SceneTree:
-		(loop as SceneTree).change_scene_to_file("res://scenes/draft.tscn")
-	else:
-		push_error("Main loop is not a SceneTree")
+func _on_options() -> void:
+	var dlg := AcceptDialog.new()
+	dlg.dialog_text = "Options coming soon with sound, fullscreen and piece themes :D"
+	add_child(dlg)
+	dlg.popup_centered()
+
+func _on_quit() -> void:
+	get_tree().quit()
