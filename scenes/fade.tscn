@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b06cekbeks870"]
 
-[ext_resource type="Script" uid="uid://cukibnv6usr6e" path="res://scenes/fade.gd" id="1_nukjo"]
+[ext_resource type="Script" uid="uid://cukibnv6usr6e" path="res://engine/fade.gd" id="1_nukjo"]
 
 [node name="Fade" type="ColorRect"]
 anchors_preset = 15
