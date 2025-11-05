@@ -1,15 +1,17 @@
 extends Control
 
-@onready var btn_new_run: Button       = $VBoxContainer/NewRun
-@onready var btn_continue: Button      = $VBoxContainer/BtnContinue
-@onready var btn_options: Button       = $VBoxContainer/BtnOptions
-@onready var btn_quit: Button          = $VBoxContainer/BtnQuit
+@onready var btn_new_run: Button       = $VBoxContainer/HBoxContainer_NewRun/NewRun
+@onready var btn_continue: Button      = $VBoxContainer/HBoxContainer_Continue/BtnContinue
+@onready var btn_options: Button       = $VBoxContainer/HBoxContainer_Options/BtnOptions
+@onready var btn_quit: Button          = $VBoxContainer/HBoxContainer_Quit/BtnQuit
 @onready var title_label: Label        = $TitleLabel
 
 # --- NEW SOUND PLAYERS ---
 @onready var sfx_hover: AudioStreamPlayer   = $SfxHover
 @onready var sfx_click: AudioStreamPlayer   = $SfxClick
 @onready var sfx_newrun: AudioStreamPlayer  = $SfxNewRun   # optional
+
+
 # --------------------------
 
 func _ready() -> void:

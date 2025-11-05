@@ -1,19 +1,73 @@
-[gd_scene load_steps=6 format=3 uid="uid://hv0hh8h16125"]
+[gd_scene load_steps=24 format=3 uid="uid://hv0hh8h16125"]
 
-[ext_resource type="Script" uid="uid://ka2yl8baga0r" path="res://engine/draft.gd" id="1_abqjp"]
+[ext_resource type="Script" uid="uid://cuslqv43dq3hs" path="res://engine/draft.gd" id="1_abqjp"]
 [ext_resource type="FontFile" uid="uid://cckircs02opgx" path="res://assets/fonts/Exo2-SemiBold.ttf" id="2_700tk"]
+[ext_resource type="Shader" uid="uid://cwqte2t4hfrm3" path="res://scenes/menu.gdshader" id="2_pjfeh"]
+[ext_resource type="Texture2D" uid="uid://cy1offpt7c24l" path="res://assets/chess/vector-chess-pieces/Board Brown 72px.png" id="3_5j11b"]
+[ext_resource type="Script" uid="uid://cvyfpb70mtfkn" path="res://scenes/background.gd" id="4_ktkuy"]
+[ext_resource type="Texture2D" uid="uid://bckgocub4uyfc" path="res://assets/chess/vector-chess-pieces/White/Pawn White Outline 72px.png" id="6_bjw16"]
+[ext_resource type="Texture2D" uid="uid://cjlkadeye4lq8" path="res://assets/chess/vector-chess-pieces/White/Knight White 72px.png" id="7_8gl8e"]
+[ext_resource type="Texture2D" uid="uid://ybml04oumnj5" path="res://assets/chess/vector-chess-pieces/White/Bishop White Outline 72px.png" id="8_8gl8e"]
+[ext_resource type="Texture2D" uid="uid://bctaqmovsw1u2" path="res://assets/chess/vector-chess-pieces/White/Rook White Outline 72px.png" id="8_vq1dt"]
+[ext_resource type="Texture2D" uid="uid://dljiiwi6enc4f" path="res://assets/chess/vector-chess-pieces/White/Queen White Outline 72px.png" id="9_5dkf5"]
+[ext_resource type="Texture2D" uid="uid://cq3vou3m2gr7r" path="res://assets/chess/vector-chess-pieces/White/King White Outline 72px.png" id="10_k5swn"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_e13b7"]
+shader = ExtResource("2_pjfeh")
+shader_parameter/scroll = Vector2(-0.6, 0.3)
+shader_parameter/darken = 0.27
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qgxk2"]
-bg_color = Color(0.12549, 0.12549, 0.12549, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.25098, 0.25098, 0.25098, 1)
+content_margin_left = 40.0
+content_margin_top = 40.0
+content_margin_right = 40.0
+content_margin_bottom = 40.0
+bg_color = Color(0.117647, 0.105882, 0.0980392, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0.0156863, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+corner_detail = 15
+expand_margin_left = 45.0
+expand_margin_top = 40.0
+expand_margin_right = 40.0
+expand_margin_bottom = 64.0
+shadow_color = Color(0.176471, 0.156863, 0.145098, 1)
+shadow_size = 20
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bjw16"]
+bg_color = Color(0.208948, 0.190239, 0.180885, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ne4an"]
+bg_color = Color(0.164706, 0.14902, 0.141176, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.376471)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0.0117647, 1)
+shadow_size = 4
 
 [sub_resource type="GDScript" id="GDScript_abqjp"]
 script/source = "extends Button
@@ -36,6 +90,106 @@ func _process(delta: float) -> void:
 	pass
 "
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_abqjp"]
+bg_color = Color(0.290196, 0.172549, 0.0784314, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+expand_margin_left = 20.0
+expand_margin_top = 20.0
+expand_margin_right = 20.0
+expand_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_700tk"]
+bg_color = Color(0.172549, 0.105882, 0.054902, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+expand_margin_left = 20.0
+expand_margin_top = 8.0
+expand_margin_right = 20.0
+expand_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pjfeh"]
+bg_color = Color(0.235294, 0.137255, 0.0705882, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 0.572549)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+expand_margin_left = 20.0
+expand_margin_top = 8.0
+expand_margin_right = 20.0
+expand_margin_bottom = 8.0
+shadow_color = Color(0, 0, 0, 0.333333)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5j11b"]
+bg_color = Color(0.290196, 0.172549, 0.0784314, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0.0313726, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+expand_margin_left = 20.0
+expand_margin_top = 8.0
+expand_margin_right = 20.0
+expand_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ktkuy"]
+bg_color = Color(0.172549, 0.105882, 0.054902, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+expand_margin_left = 20.0
+expand_margin_top = 8.0
+expand_margin_right = 20.0
+expand_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e13b7"]
+bg_color = Color(0.235294, 0.137255, 0.0705882, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0.0313726, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+expand_margin_left = 20.0
+expand_margin_top = 8.0
+expand_margin_right = 20.0
+expand_margin_bottom = 8.0
+shadow_color = Color(0, 0, 0, 0.333333)
+shadow_size = 8
+
 [node name="Draft" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -45,14 +199,28 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_abqjp")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
+modulate = Color(0.458405, 0.458405, 0.458405, 0.619608)
+texture_filter = 1
+material = SubResource("ShaderMaterial_e13b7")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.165656, 0.165656, 0.165656, 1)
+texture = ExtResource("3_5j11b")
+stretch_mode = 1
+script = ExtResource("4_ktkuy")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.309804)
 
 [node name="Panel" type="Panel" parent="."]
 custom_minimum_size = Vector2(600, 350)
@@ -62,10 +230,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -300.0
-offset_top = -150.0
-offset_right = 300.0
-offset_bottom = 150.0
+offset_left = -334.0
+offset_top = -175.0
+offset_right = 335.0
+offset_bottom = 175.0
 grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(0, 3)
@@ -78,115 +246,192 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -45.0
-offset_top = -24.5
-offset_right = 45.0
-offset_bottom = 24.5
+offset_left = -312.0
+offset_top = -191.5
+offset_right = 312.0
+offset_bottom = 191.5
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-theme_override_constants/separation = 12
+theme_override_constants/separation = 20
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 0
+theme_override_colors/font_color = Color(1, 0.909804, 0.690196, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
 theme_override_fonts/font = ExtResource("2_700tk")
-theme_override_font_sizes/font_size = 31
-text = "          BUILD YOUR FIRST RANK"
+theme_override_font_sizes/font_size = 48
+text = "   BUILD YOUR FIRST RANK"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 mouse_filter = 0
+theme_override_constants/separation = 16
 
 [node name="Slot0" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/hover = SubResource("StyleBoxFlat_bjw16")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ne4an")
 text = "—"
 script = SubResource("GDScript_abqjp")
 
 [node name="Slot1" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/hover = SubResource("StyleBoxFlat_bjw16")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ne4an")
 text = "—"
 
 [node name="Slot2" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/hover = SubResource("StyleBoxFlat_bjw16")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ne4an")
 text = "—"
 
 [node name="Slot3" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/hover = SubResource("StyleBoxFlat_bjw16")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ne4an")
 text = "—"
 
 [node name="Slot4" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/hover = SubResource("StyleBoxFlat_bjw16")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ne4an")
 text = "—"
 
 [node name="Slot5" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/hover = SubResource("StyleBoxFlat_bjw16")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ne4an")
 text = "—"
 
 [node name="Slot6" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/hover = SubResource("StyleBoxFlat_bjw16")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ne4an")
 text = "—"
 
 [node name="Slot7" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/hover = SubResource("StyleBoxFlat_bjw16")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ne4an")
 text = "—"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 32
 
 [node name="BtnPawn" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-text = "Pawn (1)"
+tooltip_text = "Pawn (cost 1)"
+theme_override_constants/h_separation = 12
+theme_override_font_sizes/font_size = 20
+icon = ExtResource("6_bjw16")
 script = SubResource("GDScript_700tk")
 
 [node name="BtnKnight" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-text = "Knight (3)"
+tooltip_text = "Knight (cost 3)"
+theme_override_constants/h_separation = 12
+theme_override_font_sizes/font_size = 20
+icon = ExtResource("7_8gl8e")
 
 [node name="BtnBishop" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-text = "Bishop (3)"
+tooltip_text = "Bishop  (cost 3)"
+theme_override_constants/h_separation = 12
+theme_override_font_sizes/font_size = 20
+icon = ExtResource("8_8gl8e")
 
 [node name="BtnRook" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-text = "Rook (5)"
+tooltip_text = "Rook  (cost 5)"
+theme_override_constants/h_separation = 12
+theme_override_font_sizes/font_size = 20
+icon = ExtResource("8_vq1dt")
 
 [node name="BtnQueen" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-text = "Queen (9)"
+tooltip_text = "Queen (cost 9)"
+theme_override_constants/h_separation = 12
+theme_override_font_sizes/font_size = 20
+icon = ExtResource("9_5dkf5")
 
 [node name="BtnKing" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-text = "King (0)"
+tooltip_text = "King (cost 0)"
+theme_override_constants/h_separation = 12
+theme_override_font_sizes/font_size = 20
+icon = ExtResource("10_k5swn")
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 64
 
 [node name="BtnConfirm" type="Button" parent="Panel/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.968627, 0.901961, 0.788235, 1)
+theme_override_fonts/font = ExtResource("2_700tk")
+theme_override_styles/hover = SubResource("StyleBoxFlat_abqjp")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_700tk")
+theme_override_styles/normal = SubResource("StyleBoxFlat_pjfeh")
 text = "Confirm
 "
 
 [node name="BtnClear" type="Button" parent="Panel/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.968627, 0.901961, 0.788235, 1)
+theme_override_fonts/font = ExtResource("2_700tk")
+theme_override_styles/hover = SubResource("StyleBoxFlat_5j11b")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ktkuy")
+theme_override_styles/normal = SubResource("StyleBoxFlat_e13b7")
 text = "Clear"
 
 [node name="BtnRandom" type="Button" parent="Panel/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.968627, 0.901961, 0.788235, 1)
+theme_override_fonts/font = ExtResource("2_700tk")
+theme_override_styles/hover = SubResource("StyleBoxFlat_5j11b")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ktkuy")
+theme_override_styles/normal = SubResource("StyleBoxFlat_e13b7")
 text = "Random
 "
 
 [node name="BudgetLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-text = "Budget: 10 | King: 0/1	"
+theme_override_colors/font_color = Color(0.839216, 0.780392, 0.658824, 1)
+theme_override_fonts/font = ExtResource("2_700tk")
+theme_override_font_sizes/font_size = 20
+text = "Budget: 20 | King: 0/1	 | Gold: 0"
 
 [node name="InfoLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_700tk")

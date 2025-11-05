@@ -5,6 +5,7 @@ const COSTS := {"P":1,"N":3,"B":3,"R":5,"Q":9,"K":0}
 var selected_slot: int = -1
 var slots: Array = []
 var budget: int = 0
+var piece_buttons := []
 
 @onready var slot_buttons: Array = [
 	$Panel/VBoxContainer/HBoxContainer/Slot0,
@@ -30,6 +31,16 @@ var budget: int = 0
 @onready var btn_confirm: Button = $Panel/VBoxContainer/HBoxContainer3/BtnConfirm
 @onready var btn_clear: Button   = $Panel/VBoxContainer/HBoxContainer3/BtnClear
 @onready var btn_random: Button  = $Panel/VBoxContainer/HBoxContainer3/BtnRandom
+
+# Small white piece icons for the draft slots
+var PIECE_ICONS := {
+	"P": preload("res://assets/chess/vector-chess-pieces/White/Pawn White Outline 72px.png"),
+	"N": preload("res://assets/chess/vector-chess-pieces/White/Knight White Outline 72px.png"),
+	"B": preload("res://assets/chess/vector-chess-pieces/White/Bishop White Outline 72px.png"),
+	"R": preload("res://assets/chess/vector-chess-pieces/White/Rook White Outline 72px.png"),
+	"Q": preload("res://assets/chess/vector-chess-pieces/White/Queen White Outline 72px.png"),
+	"K": preload("res://assets/chess/vector-chess-pieces/White/King White Outline 72px.png"),
+}
 
 
 # ---------------------------------------------------------
@@ -67,6 +78,11 @@ func _ready() -> void:
 	btn_clear.pressed.connect(Callable(self, "_clear_all"))
 	btn_random.pressed.connect(Callable(self, "_random_fill"))
 
+	piece_buttons = [
+		btn_pawn, btn_knight, btn_bishop,
+		btn_rook, btn_queen, btn_king
+]
+
 	_update_ui()
 	_set_info("Click a slot, then a piece.")
 
@@ -79,9 +95,15 @@ func _on_slot_pressed(i: int) -> void:
 
 func _highlight_slots() -> void:
 	for i in range(slot_buttons.size()):
-		slot_buttons[i].add_theme_color_override("font_color", Color.WHITE)
-	if selected_slot >= 0:
-		slot_buttons[selected_slot].add_theme_color_override("font_color", Color(0.4, 0.8, 1))
+		var btn = slot_buttons[i]
+		btn.add_theme_color_override("font_color", Color(1, 1, 1))
+		btn.self_modulate = Color(1, 1, 1)  # normal
+
+		if selected_slot >= 0:
+			var sb = slot_buttons[selected_slot]
+			sb.add_theme_color_override("font_color", Color(0.9, 0.8, 0.4))
+			sb.self_modulate = Color(1.1, 1.05, 0.9)
+
 
 func _set_info(t: String) -> void:
 	if is_instance_valid(info_label):
@@ -106,8 +128,23 @@ func _cheapest_kind(candidates: Array) -> String:
 	return best
 
 
+func _clear_piece_highlights() -> void:
+	for b in [btn_pawn, btn_knight, btn_bishop, btn_rook, btn_queen, btn_king]:
+		b.self_modulate = Color(1, 1, 1)
+
+
 # ---------------- actions ----------------
 func _pick_piece(kind: String) -> void:
+	_clear_piece_highlights()
+
+	match kind:
+		"P": btn_pawn.self_modulate = Color(1.1, 1.05, 0.9)
+		"N": btn_knight.self_modulate = Color(1.1, 1.05, 0.9)
+		"B": btn_bishop.self_modulate = Color(1.1, 1.05, 0.9)
+		"R": btn_rook.self_modulate   = Color(1.1, 1.05, 0.9)
+		"Q": btn_queen.self_modulate  = Color(1.1, 1.05, 0.9)
+		"K": btn_king.self_modulate   = Color(1.1, 1.05, 0.9)
+
 	if selected_slot < 0:
 		_set_info("Select a slot first.")
 		return
@@ -225,19 +262,43 @@ func _cost_of(arr: Array) -> int:
 
 # ---------------- ui ----------------
 func _update_ui() -> void:
+	# Update the 8 draft slots
 	for i in range(8):
-		var txt := "—"
-		if slots[i] != null:
-			txt = slots[i].kind
-		slot_buttons[i].text = txt
+		var btn: Button = slot_buttons[i]
+		var slot_cfg = slots[i]
+
+		# detect empty state **before** applying new data
+		var was_empty_before := (btn.icon == null and btn.text == "—")
+
+		if slot_cfg != null:
+			var kind: String = slot_cfg.kind
+
+			# animate only when a piece appears in an empty slot
+			if was_empty_before:
+				var tween := create_tween()
+				btn.scale = Vector2(0.75, 0.75)
+				tween.tween_property(btn, "scale", Vector2.ONE, 0.15)\
+					.set_trans(Tween.TRANS_BACK)\
+					.set_ease(Tween.EASE_OUT)
+
+			btn.text = ""
+			btn.icon = PIECE_ICONS.get(kind, null)
+		else:
+			btn.icon = null
+			btn.text = "—"
+
 	_highlight_slots()
 
 	var cost := _cost_of(slots)
 	var gold := 0
 	if has_node("/root/Game"):
 		gold = Game.gold
-	budget_label.text = "Budget: %d/%d | King: %d/1 | Gold: %d" % [cost, budget, _count_kings(), gold]
+
+	budget_label.text = "Cost: %d / %d   |   King: %d/1   |   Gold: %d" \
+		% [cost, budget, _count_kings(), gold]
+
 	btn_confirm.disabled = not (_count_kings() == 1 and cost <= budget)
+
 
 
 # ---------------- proceed ----------------

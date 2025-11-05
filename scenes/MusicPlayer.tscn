@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://d3lc4t34oftej"]
+
+[ext_resource type="AudioStream" uid="uid://c3gbohk4sacke" path="res://assets/sfx/Infinite_Gambit_Main_Theme.mp3" id="1_1a72i"]
+[ext_resource type="Script" uid="uid://db0eergy7ndt5" path="res://scenes/music_player.gd" id="2_k52d1"]
+
+[node name="MusicPlayer" type="AudioStreamPlayer"]
+stream = ExtResource("1_1a72i")
+volume_db = -12.0
+autoplay = true
+parameters/looping = true
+script = ExtResource("2_k52d1")
