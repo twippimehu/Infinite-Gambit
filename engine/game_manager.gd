@@ -4,7 +4,7 @@ class_name GameManager
 signal run_started(stage: int)
 signal battle_started(stage: int, enemy_cfg: Dictionary)
 signal battle_ended(stage: int, won: bool, turns: int)
-signal reward_granted(kind: String, data: Dictionary)
+signal reward_granted(id: String)
 
 # ---------- Run state ----------
 var run_active: bool = false
@@ -13,39 +13,56 @@ var rng: RandomNumberGenerator
 var stage: int = 0
 var wins: int = 0
 var gold: int = 0
-var upgrades: Array = []
+var upgrades: Array[String] = []          # upgrade ids, e.g. ["pawn_boost","bank_interest"]
 var player_budget: int = 20
 var army_layout: Array = []
 var last_battle_result: Dictionary = {}
-var enemy_history: Array = []  # list of {stage, budget, ai:{depth,noise}, fen?}
+var enemy_history: Array = []             # list of {stage, budget, ai:{depth,noise}}
+
+# Upgrades DB from JSON
+var upgrades_db: Array = []
 
 # Scene paths
-const SCN_MENU := "res://scenes/menu.tscn"
-const SCN_DRAFT := "res://scenes/draft.tscn"
-const SCN_BOARD := "res://scenes/board.tscn"
+const SCN_MENU   := "res://scenes/menu.tscn"
+const SCN_DRAFT  := "res://scenes/draft.tscn"
+const SCN_BOARD  := "res://scenes/board.tscn"
 const SCN_REWARD := "res://scenes/reward.tscn"
 
-func _ready() -> void:
-	pass
+# upgrades.json location
+const UPGRADES_PATH := "res://content/upgrades.json"
 
+func _ready() -> void:
+	_load_upgrades()
+
+# ---------- Helpers ----------
+func has_upgrade(id: String) -> bool:
+	return upgrades.has(id)
 
 # ---------- Run control ----------
 func start_new_run(_seed: int = Time.get_unix_time_from_system()) -> void:
 	seed = int(_seed)
 	rng = RandomNumberGenerator.new()
 	rng.seed = seed
+
 	run_active = true
 	stage = 1
 	wins = 0
 	gold = 0
 	upgrades.clear()
 	enemy_history.clear()
+	army_layout.clear()
+	player_budget = 20   # base; passives like budget_boost will add to this
+
 	emit_signal("run_started", stage)
 	_change_scene(SCN_DRAFT)
 
 
 func proceed_to_battle() -> void:
 	assert(run_active)
+	if rng == null:
+		rng = RandomNumberGenerator.new()
+		rng.seed = seed
+
 	var enemy_cfg := _make_enemy_cfg(stage)
 	enemy_history.append(enemy_cfg)
 	emit_signal("battle_started", stage, enemy_cfg)
@@ -58,42 +75,80 @@ func proceed_to_reward(_won: bool, _turns: int) -> void:
 
 	if _won:
 		wins += 1
-		var base := 5 + int(2.0 * stage)
+
+		# base gold for victory
+		var base := 5 + int(1 * stage)
 		var quick_bonus := 2 if (_turns > 0 and _turns <= 30) else 0
-		gold += base + quick_bonus
+		var total := base + quick_bonus
+
+		# passive: Bank Interest (+1 per win)
+		if has_upgrade("bank_interest"):
+			total += 1
+
+		# passive: Golden Touch (50% more victory gold)
+		if has_upgrade("golden_touch"):
+			total = int(round(float(total) * 1.5))
+
+		gold += total
+
+		# if board still exists, update gold label
+		if has_node("/root/Board"):
+			var board = get_node("/root/Board")
+			if board.has_method("_update_gold"):
+				board._update_gold()
+
 		_change_scene(SCN_REWARD)
 	else:
 		run_active = false
 		_change_scene(SCN_MENU)
 
 
+# called by board.gd
 func on_battle_end(won: bool, turns: int) -> void:
-	print("Battle ended. Won:", won, "Turns:", turns)
-	if won:
-		get_tree().change_scene_to_file(SCN_REWARD)
-	else:
-		start_new_run()
+	proceed_to_reward(won, turns)
 
 
-func on_reward_chosen(kind: String, data: Dictionary) -> void:
-	match kind:
+# called by reward.gd
+# 'choice' is one of the dictionaries from upgrades_db / generate_reward_choices()
+func on_reward_chosen(choice: Dictionary) -> void:
+	var t := String(choice.get("type", ""))
+	match t:
 		"gold":
-			gold += int(data.get("amount", 0))
+			var base := int(choice.get("amount", 0))
+			var gain := base
+			# Golden Touch also boosts direct gold rewards
+			if has_upgrade("golden_touch"):
+				gain = int(round(float(gain) * 1.5))
+			gold += gain
+
+			# update board gold label if present
 			if has_node("/root/Board"):
 				var board = get_node("/root/Board")
 				if board.has_method("_update_gold"):
 					board._update_gold()
-		"upgrade":
-			var tag := String(data.get("tag", ""))
-			if tag != "":
-				upgrades.append(tag)
-				emit_signal("reward_granted", kind, data)
-		"budget_inc":
-			player_budget += int(data.get("amount", 0))
+
+		"passive":
+			var id := String(choice.get("id", ""))
+			if id != "" and not upgrades.has(id):
+				upgrades.append(id)
+				emit_signal("reward_granted", id)
+				_apply_immediate_upgrade_effect(id)
+
 		_:
 			pass
+
+	# go next stage
 	stage += 1
 	proceed_to_battle()
+
+
+func _apply_immediate_upgrade_effect(id: String) -> void:
+	match id:
+		"budget_boost":
+			player_budget += 3
+		# The rest are applied in board/draft/battle logic later
+		_:
+			pass
 
 
 # ---------- Data accessors ----------
@@ -113,69 +168,90 @@ func get_current_enemy_cfg() -> Dictionary:
 	return enemy_history[enemy_history.size() - 1]
 
 
-# ---------- Reward generation ----------
+# ---------- Reward generation using upgrades.json ----------
 func generate_reward_choices() -> Array:
-	var choices: Array = []
-	var upgrades_data := _load_upgrades_data()
-	if upgrades_data.is_empty():
-		push_warning("No upgrades.json found or empty.")
-		return []
+	var result: Array = []
 
-	# rarity weights (lower chance for higher rarity)
-	var weights := {1: 60, 2: 30, 3: 10}
+	if upgrades_db.is_empty():
+		push_warning("No upgrades in upgrades_db, using fallback.")
+		# simple fallback
+		var gold_amt := 3 + 2 * stage
+		result.append({
+			"id": "gold_fallback",
+			"name": "+%d Gold" % gold_amt,
+			"desc": "Gain gold for future upgrades.",
+			"type": "gold",
+			"amount": gold_amt,
+			"rarity": 1
+		})
+		result.append({
+			"id": "pawn_boost",
+			"name": "Rapid Pawns",
+			"desc": "Your pawns move 3 on their first turn.",
+			"type": "passive",
+			"rarity": 2
+		})
+		result.append({
+			"id": "budget_boost",
+			"name": "Budget Boost",
+			"desc": "Increase draft budget by +3.",
+			"type": "passive",
+			"rarity": 2
+		})
+		return result
 
-	# Pick upgrades by category
-	var gold_upgrade := upgrades_data.filter(_is_gold)
-	if gold_upgrade.size() > 0:
-		choices.append(gold_upgrade[randi() % gold_upgrade.size()])
-
-	var passive_upgrade := upgrades_data.filter(_is_passive)
-	if passive_upgrade.size() > 0:
-		choices.append(passive_upgrade[randi() % passive_upgrade.size()])
-
-	choices.append(_pick_random_upgrade(upgrades_data, weights))
-	return choices
-
-
-func _pick_random_upgrade(upgrades_data: Array, weights: Dictionary) -> Dictionary:
+	# weighted pool: lower rarity = more common
 	var pool: Array = []
-	for u in upgrades_data:
-		var r: int = int(u.get("rarity", 1))
-		if r < 1 or r > 3:
-			r = 1
-		for i in range(weights[r]):
+	for u in upgrades_db:
+		var id := String(u.get("id", ""))
+		var tp := String(u.get("type", ""))
+		var r := int(u.get("rarity", 1))
+
+		# don't offer a passive we already own
+		if tp == "passive" and upgrades.has(id):
+			continue
+
+		var weight := 1
+		match r:
+			1:
+				weight = 5
+			2:
+				weight = 3
+			3:
+				weight = 1
+
+		for i in weight:
 			pool.append(u)
-	return pool[randi() % pool.size()]
+
+	if pool.is_empty():
+		pool = upgrades_db.duplicate()
+
+	if rng == null:
+		rng = RandomNumberGenerator.new()
+		rng.seed = seed
+
+	var picks: int = min(3, pool.size())
+	var used_ids: Array[String] = []
+
+	for i in picks:
+		var choice: Dictionary = {}
+		var attempts := 0
+		while attempts < 16:
+			var candidate: Dictionary = pool[rng.randi_range(0, pool.size() - 1)]
+			var cid := String(candidate.get("id", ""))
+			if not used_ids.has(cid):
+				choice = candidate
+				used_ids.append(cid)
+				break
+			attempts += 1
+
+		if choice.size() > 0:
+			result.append(choice.duplicate(true))
+
+	return result
 
 
-func _is_gold(u: Dictionary) -> bool:
-	return u.get("type", "") == "gold"
-
-
-func _is_passive(u: Dictionary) -> bool:
-	return u.get("type", "") == "passive"
-
-
-# ---------- JSON loader ----------
-func _load_upgrades_data() -> Array:
-	var path := "res://content/upgrades.json"
-	print("Loading upgrades from:", path)
-	var f := FileAccess.open(path, FileAccess.READ)
-	if f == null:
-		push_error("Failed to open upgrades.json.")
-		return []
-	var txt := f.get_as_text()
-	print("File text length:", txt.length())
-	var data: Array = JSON.parse_string(txt)
-	if typeof(data) == TYPE_ARRAY:
-		print("Loaded upgrades count:", data.size())
-		return data
-	else:
-		push_error("upgrades.json invalid format.")
-		return []
-
-
-# ---------- Scaling & generation ----------
+# ---------- Scaling & enemy generation ----------
 func _make_enemy_cfg(at_stage: int) -> Dictionary:
 	var budget := 16 + 2 * at_stage + int(0.5 * max(at_stage - 5, 0))
 	var depth: int = clamp(1 + int((at_stage - 1) / 3), 1, 4)
@@ -185,6 +261,26 @@ func _make_enemy_cfg(at_stage: int) -> Dictionary:
 		"budget": budget,
 		"ai": {"depth": depth, "noise": noise}
 	}
+
+
+# ---------- Load upgrades.json once ----------
+func _load_upgrades() -> void:
+	if not FileAccess.file_exists(UPGRADES_PATH):
+		push_warning("upgrades.json not found at: %s" % UPGRADES_PATH)
+		return
+
+	var f := FileAccess.open(UPGRADES_PATH, FileAccess.READ)
+	if f == null:
+		push_warning("Failed to open upgrades.json at: %s" % UPGRADES_PATH)
+		return
+
+	var txt := f.get_as_text()
+	var data = JSON.parse_string(txt)
+	if typeof(data) == TYPE_ARRAY:
+		upgrades_db = data
+		print("Loaded upgrades:", upgrades_db.size())
+	else:
+		push_warning("upgrades.json has invalid JSON format.")
 
 
 # ---------- Scene control ----------

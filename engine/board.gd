@@ -5,6 +5,8 @@ const PieceScene = preload("res://scenes/Piece.tscn")
 
 var state: GameStateRes
 
+@onready var left_panel  = $LeftPanel
+@onready var right_panel = $RightPanel
 @onready var board_sprite: Sprite2D = $BoardSprite
 @onready var ui_label: Label = $UI/StatusLabel
 @onready var pieces_layer: Node2D = Node2D.new()
@@ -58,6 +60,7 @@ func _ready():
 				"side": 0,
 				"has_moved": false
 			}
+	
 	_spawn_all_pieces()
 	_update_status("White begins.")
 	_update_gold()

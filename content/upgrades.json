@@ -15,62 +15,7 @@
 	"amount": 10,
 	"rarity": 2
   },
-  {
-	"id": "extra_queen",
-	"name": "Royal Expansion",
-	"desc": "Start future battles with one bonus queen in a random slot.",
-	"type": "passive",
-	"rarity": 3
-  },
-  {
-	"id": "pawn_boost",
-	"name": "Rapid Pawns",
-	"desc": "Your pawns move 3 on their first turn for the rest of the run.",
-	"type": "passive",
-	"rarity": 2
-  },
-  {
-	"id": "pawn_shield",
-	"name": "Pawn Shield",
-	"desc": "Pawns grant +1 defense to adjacent allies.",
-	"type": "passive",
-	"rarity": 2
-  },
-  {
-	"id": "knight_dash",
-	"name": "Knight Dash",
-	"desc": "Knights can immediately move again after capturing.",
-	"type": "passive",
-	"rarity": 3
-  },
-  {
-	"id": "bishop_channel",
-	"name": "Bishop Channel",
-	"desc": "Bishops gain +1 diagonal range.",
-	"type": "passive",
-	"rarity": 2
-  },
-  {
-	"id": "rook_fortress",
-	"name": "Rook Fortress",
-	"desc": "Rooks cannot be captured while defended.",
-	"type": "passive",
-	"rarity": 3
-  },
-  {
-	"id": "queen_fury",
-	"name": "Queen Fury",
-	"desc": "Your queen’s first move each battle is free.",
-	"type": "passive",
-	"rarity": 3
-  },
-  {
-	"id": "king_guard",
-	"name": "King’s Guard",
-	"desc": "The king gains +1 defense for each adjacent ally.",
-	"type": "passive",
-	"rarity": 2
-  },
+
   {
 	"id": "bank_interest",
 	"name": "Bank Interest",
@@ -92,13 +37,7 @@
 	"type": "passive",
 	"rarity": 3
   },
-  {
-	"id": "extra_slot",
-	"name": "Extra Slot",
-	"desc": "Add one more slot to your army layout.",
-	"type": "passive",
-	"rarity": 2
-  },
+
   {
 	"id": "budget_boost",
 	"name": "Budget Boost",
@@ -107,11 +46,49 @@
 	"rarity": 2
   },
   {
-	"id": "scout_ahead",
-	"name": "Scout Ahead",
-	"desc": "Preview the next enemy’s formation before drafting.",
+	"id": "extra_slot",
+	"name": "Extra Slot",
+	"desc": "Add one more slot to your army layout.",
+	"type": "passive",
+	"rarity": 2
+  },
+
+  {
+	"id": "reinforcements",
+	"name": "Reinforcements",
+	"desc": "Spawn one extra pawn at the start of every battle.",
+	"type": "passive",
+	"rarity": 1
+  },
+
+  {
+	"id": "extra_queen",
+	"name": "Royal Expansion",
+	"desc": "Start future battles with one bonus queen in a random slot.",
 	"type": "passive",
 	"rarity": 3
+  },
+  {
+	"id": "extra_knight",
+	"name": "Twin Knights",
+	"desc": "Start future battles with one bonus knight in a random slot.",
+	"type": "passive",
+	"rarity": 2
+  },
+  {
+	"id": "extra_rook",
+	"name": "Fortified Flanks",
+	"desc": "Start future battles with one bonus rook in a random slot.",
+	"type": "passive",
+	"rarity": 3
+  },
+
+  {
+	"id": "pawn_boost",
+	"name": "Rapid Pawns",
+	"desc": "Your pawns move 3 on their first turn for the rest of the run.",
+	"type": "passive",
+	"rarity": 2
   },
   {
 	"id": "opening_gambit",
@@ -120,67 +97,12 @@
 	"type": "passive",
 	"rarity": 2
   },
+
   {
-	"id": "momentum",
-	"name": "Momentum",
-	"desc": "Gain +1 move speed after each capture (resets each stage).",
+	"id": "scout_ahead",
+	"name": "Scout Ahead",
+	"desc": "Preview the next enemy’s formation before drafting.",
 	"type": "passive",
 	"rarity": 3
-  },
-  {
-	"id": "reinforcements",
-	"name": "Reinforcements",
-	"desc": "Spawn one extra pawn at the start of every battle.",
-	"type": "passive",
-	"rarity": 1
-  },
-  {
-	"id": "fog_of_war",
-	"name": "Fog of War",
-	"desc": "Enemy pieces start hidden for the first turn.",
-	"type": "passive",
-	"rarity": 2
-  },
-  {
-	"id": "time_dilation",
-	"name": "Time Dilation",
-	"desc": "Enemy AI is slowed for the first 5 turns of battle.",
-	"type": "passive",
-	"rarity": 2
-  },
-  {
-	"id": "weak_morale",
-	"name": "Weak Morale",
-	"desc": "Enemies lose one random piece at the start after stage 5.",
-	"type": "passive",
-	"rarity": 3
-  },
-  {
-	"id": "predictive_line",
-	"name": "Predictive Line",
-	"desc": "Highlights your two best moves each turn.",
-	"type": "passive",
-	"rarity": 3
-  },
-  {
-	"id": "exploding_pawns",
-	"name": "Exploding Pawns",
-	"desc": "Pawns explode when captured, damaging adjacent enemies.",
-	"type": "passive",
-	"rarity": 3
-  },
-  {
-	"id": "double_turn",
-	"name": "Double Turn",
-	"desc": "Every 5th turn, you may move twice.",
-	"type": "passive",
-	"rarity": 3
-  },
-  {
-	"id": "piece_swap",
-	"name": "Piece Swap",
-	"desc": "Once per battle, swap any two of your pieces.",
-	"type": "passive",
-	"rarity": 2
   }
 ]
