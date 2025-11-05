@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bkccyfijc4rfp"]
+[gd_scene load_steps=21 format=3 uid="uid://bkccyfijc4rfp"]
 
 [ext_resource type="Script" uid="uid://cwulut2e7hkxw" path="res://engine/menu.gd" id="1_vjb58"]
 [ext_resource type="Shader" uid="uid://cwqte2t4hfrm3" path="res://scenes/menu.gdshader" id="2_4ytvr"]
@@ -6,82 +6,89 @@
 [ext_resource type="FontFile" uid="uid://cckircs02opgx" path="res://assets/fonts/Exo2-SemiBold.ttf" id="2_vjb58"]
 [ext_resource type="Script" uid="uid://cvyfpb70mtfkn" path="res://scenes/background.gd" id="3_4ytvr"]
 [ext_resource type="Script" uid="uid://b4wqtfw6sx77a" path="res://scenes/v_box_container.gd" id="6_g3eks"]
+[ext_resource type="AudioStream" uid="uid://chia7s87bvgrv" path="res://assets/sfx/ui_hover.wav" id="7_13sgg"]
+[ext_resource type="AudioStream" uid="uid://bs7x2dhoj2lu1" path="res://assets/sfx/ui_click.wav" id="8_i6lef"]
+[ext_resource type="AudioStream" uid="uid://c3gbohk4sacke" path="res://assets/sfx/The Knight's Gambit.mp3" id="9_i6lef"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_g3eks"]
 shader = ExtResource("2_4ytvr")
-shader_parameter/scroll = Vector2(-0.4, 0)
-shader_parameter/darken = 0.5
+shader_parameter/scroll = Vector2(0.3, 0.3)
+shader_parameter/darken = 0.27
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4ytvr"]
-bg_color = Color(0.2, 0.2, 0.2, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.06, 0.06, 0.06, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-corner_detail = 10
-
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_g3eks"]
-light_mode = 1
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v86rl"]
-bg_color = Color(0.376471, 0.2, 0.0980392, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.862745, 0.705882, 0.435294, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-shadow_color = Color(0.862745, 0.705882, 0.435294, 0.25098)
-shadow_size = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_13sgg"]
-bg_color = Color(0.180392, 0.101961, 0.0509804, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.803922, 0.647059, 0.356863, 1)
-border_blend = true
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-shadow_color = Color(0, 0, 0, 0.25098)
-shadow_size = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i6lef"]
-bg_color = Color(0.290196, 0.168627, 0.0745098, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.168627, 0.101961, 0.0627451, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.25098)
-shadow_size = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g3eks"]
-bg_color = Color(0.340311, 0.202991, 0.090987, 0.733333)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.37, 0.220027, 0.0888, 0.92549)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
+[sub_resource type="Animation" id="Animation_v86rl"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../VBoxContainer/NewRun:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../VBoxContainer/BtnContinue:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("../VBoxContainer/BtnOptions:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("../VBoxContainer/BtnQuit:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("../ColorRect:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("../TitleLabel:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1.05, 1.05)]
+}
 
 [sub_resource type="Animation" id="Animation_4ytvr"]
 resource_name = "fade_in_buttons"
@@ -162,87 +169,83 @@ tracks/5/keys = {
 [sub_resource type="Animation" id="Animation_g3eks"]
 resource_name = "scroll"
 
-[sub_resource type="Animation" id="Animation_v86rl"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../VBoxContainer/NewRun:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("../VBoxContainer/BtnContinue:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 0)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("../VBoxContainer/BtnOptions:modulate")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 0)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("../VBoxContainer/BtnQuit:modulate")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 0)]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("../ColorRect:modulate")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 0)]
-}
-tracks/5/type = "value"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath("../TitleLabel:scale")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(1.05, 1.05)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_v86rl"]
 _data = {
 &"RESET": SubResource("Animation_v86rl"),
 &"fade_in_buttons": SubResource("Animation_4ytvr"),
 &"scroll": SubResource("Animation_g3eks")
 }
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4ytvr"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.06, 0.06, 0.06, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 10
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_g3eks"]
+light_mode = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v86rl"]
+bg_color = Color(0.376471, 0.2, 0.0980392, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.862745, 0.705882, 0.435294, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0.862745, 0.705882, 0.435294, 0.25098)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_13sgg"]
+bg_color = Color(0.180392, 0.101961, 0.0509804, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.803922, 0.647059, 0.356863, 1)
+border_blend = true
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.25098)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i6lef"]
+bg_color = Color(0.290196, 0.168627, 0.0745098, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.168627, 0.101961, 0.0627451, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.25098)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g3eks"]
+bg_color = Color(0.340311, 0.202991, 0.090987, 0.733333)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.37, 0.220027, 0.0888, 0.92549)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -266,6 +269,13 @@ grow_vertical = 2
 texture = ExtResource("2_mhnvy")
 stretch_mode = 1
 script = ExtResource("3_4ytvr")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../Background")
+libraries = {
+&"": SubResource("AnimationLibrary_v86rl")
+}
+autoplay = "fade_in_buttons"
 
 [node name="TitleLabel" type="Label" parent="."]
 layout_mode = 1
@@ -399,9 +409,16 @@ theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_g3eks")
 text = "v0.1.0"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-root_node = NodePath("../Background")
-libraries = {
-&"": SubResource("AnimationLibrary_v86rl")
-}
-autoplay = "fade_in_buttons"
+[node name="SfxHover" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_13sgg")
+volume_db = -30.322
+pitch_scale = 0.75
+
+[node name="SfxClick" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_i6lef")
+volume_db = -6.0
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_i6lef")
+volume_db = -12.0
+autoplay = true
