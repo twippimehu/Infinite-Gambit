@@ -1,6 +1,6 @@
 [gd_scene load_steps=13 format=3 uid="uid://o5x8jw35pc5x"]
 
-[ext_resource type="Script" path="res://engine/reward.gd" id="1_4vy62"]
+[ext_resource type="Script" uid="uid://mna8no8tr4pb" path="res://engine/reward.gd" id="1_4vy62"]
 [ext_resource type="FontFile" uid="uid://cckircs02opgx" path="res://assets/fonts/Exo2-SemiBold.ttf" id="2_msj68"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ghuxa"]

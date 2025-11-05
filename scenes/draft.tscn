@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://hv0hh8h16125"]
 
-[ext_resource type="Script" uid="uid://p6b3p16mfxt" path="res://engine/draft.gd" id="1_abqjp"]
+[ext_resource type="Script" uid="uid://ka2yl8baga0r" path="res://engine/draft.gd" id="1_abqjp"]
 [ext_resource type="FontFile" uid="uid://cckircs02opgx" path="res://assets/fonts/Exo2-SemiBold.ttf" id="2_700tk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qgxk2"]
