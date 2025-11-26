@@ -230,6 +230,12 @@ func generate_shop_choices() -> Array:
 	return pool.slice(0, count)
 
 
+func get_upgrade_name(id: String) -> String:
+	for u in upgrades_db:
+		if String(u.get("id", "")) == id:
+			return String(u.get("name", id))
+	return id  # fallback
+
 # -----------------------------
 #  REWARD CHOICE GENERATION
 # -----------------------------

@@ -12,6 +12,13 @@ var state: GameStateRes
 @onready var pieces_layer: Node2D = Node2D.new()
 @onready var highlight_layer: Node2D = Node2D.new()
 @onready var lbl_budget: Label = $Panel/VBoxContainer/BudgetLabel
+@onready var upgrades_list: Label = $LeftPanel/VBox/UpgradesList
+@onready var tools_panel: PanelContainer = $UI/ToolsPanel
+@onready var btn_undo: Button = $UI/ToolsPanel/MarginContainer/VBoxContainer/BtnUndo
+@onready var chk_ai: CheckButton = $UI/ToolsPanel/MarginContainer/VBoxContainer/ChkAIBlack
+@onready var btn_fen: Button = $UI/ToolsPanel/MarginContainer/VBoxContainer/BtnCopyFen
+
+
 
 var selected_square: Vector2i = Vector2i(-1, -1)
 var selected_piece_node: Node2D = null
@@ -64,13 +71,33 @@ func _ready():
 	_spawn_all_pieces()
 	_update_status("White begins.")
 	_update_gold()
+	_update_upgrades_list()
+	_setup_tools_ui()
+	Game.reward_granted.connect(_on_reward_granted)
 
+func _on_reward_granted(id: String) -> void:
+	_update_upgrades_list()
 
 func _update_gold() -> void:
 	if has_node("LeftPanel/VBox/Label_Gold"):
 		var label: Label = $LeftPanel/VBox/Label_Gold
 		label.text = "🪙 Gold: %d" % Game.gold
 
+
+func _update_upgrades_list() -> void:
+	if upgrades_list == null:
+		return
+
+	if Game.upgrades.is_empty():
+		upgrades_list.text = "None"
+		return
+
+	var lines: Array[String] = []
+	for id in Game.upgrades:
+		var name = Game.get_upgrade_name(id)
+		lines.append("• %s" % name)
+
+	upgrades_list.text = "\n".join(lines)
 
 
 	# --- Apply upgrades that modify gameplay ---
@@ -97,7 +124,6 @@ func _update_gold() -> void:
 	_sfx["check"].stream = sfx_check
 	_sfx["mate"].stream = sfx_mate
 
-	_setup_ui_buttons()
 
 # -------------------------------------------------------------------
 # Helpers
@@ -681,32 +707,29 @@ func _perform_undo_step() -> void:
 	# --- Update turn + EP marker ---
 	last_double_pawn = m.get("ep_marker", Vector2i(-1, -1))
 	current_turn = moved_side
-
-
-
-
+	
 # -------------------------------------------------------------------
-# UI buttons
-func _setup_ui_buttons():
-	var ui := $UI/ButtonContainer
-	var undo := Button.new()
-	undo.text = "Undo"
-	var ai_toggle := CheckButton.new()
-	ai_toggle.text = "AI Black"
-	ai_toggle.button_pressed = ai_plays_black
-	ai_toggle.toggled.connect(func(v): ai_plays_black = v)
-	var fen_btn := Button.new()
-	fen_btn.text = "Copy FEN"
-	fen_btn.pressed.connect(func():
-		var fen = get_fen()
+
+# UI
+func _setup_tools_ui() -> void:
+	if not is_instance_valid(tools_panel):
+		return
+
+	# Undo
+	btn_undo.pressed.connect(undo_last_move)
+
+	# AI toggle
+	chk_ai.button_pressed = ai_plays_black
+	chk_ai.toggled.connect(func(v: bool) -> void:
+		ai_plays_black = v
+	)
+
+	# Copy FEN
+	btn_fen.pressed.connect(func() -> void:
+		var fen := get_fen()
 		DisplayServer.clipboard_set(fen)
 		_update_status("Copied FEN:\n" + fen)
 	)
-	ui.add_child(undo)
-	ui.add_child(ai_toggle)
-	ui.add_child(fen_btn)
-	ui.alignment = BoxContainer.ALIGNMENT_CENTER
-	undo.pressed.connect(func(): undo_last_move())
 
 # -------------------------------------------------------------------
 # FEN export
