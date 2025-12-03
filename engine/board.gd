@@ -67,13 +67,17 @@ func _ready():
 				"side": 0,
 				"has_moved": false
 			}
-	
+
+	# Apply passive upgrades that modify the starting army
+	_apply_starting_unit_upgrades()
+
 	_spawn_all_pieces()
 	_update_status("White begins.")
 	_update_gold()
 	_update_upgrades_list()
 	_setup_tools_ui()
 	Game.reward_granted.connect(_on_reward_granted)
+
 
 func _on_reward_granted(id: String) -> void:
 	_update_upgrades_list()
@@ -158,6 +162,44 @@ func _respawn_piece_node(kind: String, side: int, r: int, c: int) -> Node2D:
 		icon.scale = Vector2(sq.x / tex_size.x, sq.y / tex_size.y) * 0.9
 	pieces_layer.add_child(p)
 	return p
+
+func _add_extra_piece(kind: String, side: int, preferred_rows: Array[int]) -> void:
+	# Build a shuffled list of columns 0..7 so placement feels random
+	var cols: Array[int] = []
+	for c in range(8):
+		cols.append(c)
+	cols.shuffle()
+
+	for row in preferred_rows:
+		if row < 0 or row > 7:
+			continue
+		for c in cols:
+			if state.board[row][c] == null:
+				state.board[row][c] = {
+					"kind": kind,
+					"side": side,
+					"has_moved": false
+				}
+				return  # placed successfully
+
+func _apply_starting_unit_upgrades() -> void:
+	if not has_node("/root/Game"):
+		return
+
+	# All of these affect the player (white, side = 0)
+	if Game.has_upgrade("reinforcements"):
+		# Prefer the pawn rank (row 1), then back rank if needed
+		_add_extra_piece("P", 0, [1, 0])
+
+	if Game.has_upgrade("extra_queen"):
+		_add_extra_piece("Q", 0, [0, 1])
+
+	if Game.has_upgrade("extra_knight"):
+		_add_extra_piece("N", 0, [0, 1])
+
+	if Game.has_upgrade("extra_rook"):
+		_add_extra_piece("R", 0, [0, 1])
+
 
 func _find_piece_node_at(square: Vector2i) -> Node2D:
 	for p in pieces_layer.get_children():
@@ -361,13 +403,26 @@ func _try_move(target: Vector2i):
 		var side_name = "White" if current_turn == 0 else "Black"
 		_update_status(side_name + " to move.")
 
+	# Award gold for certain passives when a capture happens
 	if captured != null:
+		if has_node("/root/Game") and piece.side == 0:
+			# Spoils of War: +2 gold per captured enemy piece
+			if Game.has_upgrade("spoils_of_war"):
+				Game.gold += 2
+				_update_gold()
+
+			# Opening Gambit: +1 gold if your very first move is a capture
+			if Game.has_upgrade("opening_gambit") and move_stack.size() == 1:
+				Game.gold += 1
+				_update_gold()
+
 		_play_sfx("capture")
 	else:
 		_play_sfx("move")
 
 	if ai_plays_black and current_turn == 1 and not game_over:
 		_ai_move()
+
 
 # -------------------------------------------------------------------
 # Highlighting

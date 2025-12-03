@@ -11,13 +11,21 @@ extends Control
 var buttons: Array[Button] = []   # only item buttons, not skip
 var choices: Array = []           # dictionaries from Game.generate_reward_choices()
 
+func _update_gold_label() -> void:
+	if gold_label:
+		gold_label.text = "Gold: %d" % Game.gold
+
 func _ready() -> void:
 	# collect item buttons (all buttons except BtnSkip)
 	for child in container.get_children():
 		if child is Button and child != btn_skip:
 			buttons.append(child)
-	_update_gold_label()
 
+	# connect buy callback ONCE
+	for i in range(buttons.size()):
+		buttons[i].pressed.connect(Callable(self, "_on_buy_pressed").bind(i))
+
+	_update_gold_label()
 
 	lbl_title.text = "Shop"
 
@@ -28,9 +36,6 @@ func _ready() -> void:
 	btn_skip.pressed.connect(_on_skip_pressed)
 	btn_reroll.pressed.connect(_on_reroll_pressed)
 
-func _update_gold_label():
-	if gold_label:
-		gold_label.text = "Gold: %d" % Game.gold
 
 
 # ---------------------------------------------------------
@@ -49,7 +54,7 @@ func _play_intro_animation() -> void:
 # SETUP BUTTONS FROM Game.generate_reward_choices()
 # ---------------------------------------------------------
 func _setup_buttons_with_choices() -> void:
-	choices = Game.generate_reward_choices()
+	choices = Game.generate_shop_choices()
 
 	for i in range(buttons.size()):
 		var btn = buttons[i]
@@ -108,15 +113,20 @@ func _on_button_pressed(btn: Button) -> void:
 
 func _on_reroll_pressed() -> void:
 	var cost := 2
-	if Game.gold < cost:
+	if not Game.try_spend_gold(cost):
 		print("Not enough gold for reroll.")
 		return
 
-	Game.gold -= cost
 	_update_gold_label()
 
 	# generate new shop items
-	choices = Game.generate_reward_choices()
+	choices = Game.generate_shop_choices()
+	_setup_buttons_with_choices()
+	print("Rerolled shop.")
+
+
+	# generate new shop items
+	choices = Game.generate_shop_choices()
 	_setup_buttons_with_choices()
 	print("Rerolled shop.")
 
@@ -130,12 +140,10 @@ func _on_buy_pressed(idx: int) -> void:
 
 	var choice: Dictionary = choices[idx]
 	var price: int = Game.get_shop_price(choice)
-	if Game.gold < price:
-		print("Not enough gold. Need", price, "have", Game.gold)
+	if not Game.try_spend_gold(price):
+		print("Not enough gold.")
 		return
 
-	# pay and apply
-	Game.gold -= price
 	Game.apply_shop_purchase(choice)
 	_update_gold_label()
 

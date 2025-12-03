@@ -25,6 +25,9 @@ var enemy_history: Array = []
 var upgrades_db: Array = []
 const UPGRADES_PATH := "res://content/upgrades.json"
 
+# temporarily disabled upgrades (not implemented yet)
+const DISABLED_UPGRADES := ["extra_slot", "scout_ahead"]
+
 # SCENES
 const SCN_MENU   := "res://scenes/menu.tscn"
 const SCN_DRAFT  := "res://scenes/draft.tscn"
@@ -43,6 +46,14 @@ func _ready() -> void:
 func has_upgrade(id: String) -> bool:
 	return upgrades.has(id)
 
+
+func try_spend_gold(amount: int) -> bool:
+	if amount <= 0:
+		return true
+	if gold < amount:
+		return false
+	gold -= amount
+	return true
 
 # -----------------------------
 #  START NEW RUN
@@ -210,6 +221,8 @@ func generate_shop_choices() -> Array:
 		var tp := String(u.get("type", ""))
 		var id := String(u.get("id", ""))
 
+		if DISABLED_UPGRADES.has(id):
+			continue
 		if tp == "gold":
 			continue
 		if tp == "passive" and upgrades.has(id):
@@ -230,6 +243,7 @@ func generate_shop_choices() -> Array:
 	return pool.slice(0, count)
 
 
+
 func get_upgrade_name(id: String) -> String:
 	for u in upgrades_db:
 		if String(u.get("id", "")) == id:
@@ -246,6 +260,8 @@ func generate_reward_choices() -> Array:
 		var id := String(u.get("id", ""))
 		var tp := String(u.get("type", ""))
 
+		if DISABLED_UPGRADES.has(id):
+			continue
 		if tp == "passive" and upgrades.has(id):
 			continue
 
@@ -262,6 +278,7 @@ func generate_reward_choices() -> Array:
 
 	var count: int = min(3, pool.size())
 	return pool.slice(0, count)
+
 
 
 # -----------------------------
