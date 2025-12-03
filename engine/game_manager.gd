@@ -20,13 +20,14 @@ var player_budget: int = 20
 var army_layout: Array = []
 var last_battle_result: Dictionary = {}
 var enemy_history: Array = []
+var game_mode: String = "classic"  # "classic" or "infinite"
 
 # upgrades.json
 var upgrades_db: Array = []
 const UPGRADES_PATH := "res://content/upgrades.json"
 
 # temporarily disabled upgrades (not implemented yet)
-const DISABLED_UPGRADES := ["extra_slot", "scout_ahead"]
+const DISABLED_UPGRADES := ["extra_slot"]
 
 # SCENES
 const SCN_MENU   := "res://scenes/menu.tscn"
@@ -34,6 +35,11 @@ const SCN_DRAFT  := "res://scenes/draft.tscn"
 const SCN_BOARD  := "res://scenes/board.tscn"
 const SCN_REWARD := "res://scenes/reward.tscn"
 const SCN_SHOP   := "res://scenes/shop.tscn"
+const MUTATOR_POOL := {
+	"fields": ["extra_pawns", "wide_rooks"],
+	"ruins":  ["reinforced_king", "aggressive_ai"],
+	"citadel":["queen_wall", "cold_precision"]
+}
 
 
 func _ready() -> void:
@@ -58,7 +64,9 @@ func try_spend_gold(amount: int) -> bool:
 # -----------------------------
 #  START NEW RUN
 # -----------------------------
-func start_new_run(_seed: int = Time.get_unix_time_from_system()) -> void:
+func start_new_run(_seed: int = Time.get_unix_time_from_system(), mode: String = "classic") -> void:
+	game_mode = mode
+
 	seed = int(_seed)
 	rng = RandomNumberGenerator.new()
 	rng.seed = seed
@@ -74,6 +82,7 @@ func start_new_run(_seed: int = Time.get_unix_time_from_system()) -> void:
 
 	emit_signal("run_started", stage)
 	_change_scene(SCN_DRAFT)
+
 
 
 # -----------------------------
@@ -177,10 +186,9 @@ func on_reward_chosen(choice: Dictionary) -> void:
 			emit_signal("reward_granted", id)
 			_apply_immediate_upgrade_effect(id)
 
-	# go next stage and move to shop
+	# go next stage and return to draft
 	stage += 1
 	_change_scene(SCN_SHOP)
-
 
 # -----------------------------
 #  APPLY SHOP PURCHASE
@@ -284,17 +292,88 @@ func generate_reward_choices() -> Array:
 # -----------------------------
 #  ENEMY GENERATION
 # -----------------------------
+const CLASSIC_ACTS := {
+	1: {"act": 1, "theme": "Fields",  "start": 1,  "end": 10},
+	2: {"act": 2, "theme": "Ruins",   "start": 11, "end": 20},
+	3: {"act": 3, "theme": "Citadel", "start": 21, "end": 30}
+}
+
+func _get_act_for_stage(s: int) -> Dictionary:
+	for act_data in CLASSIC_ACTS.values():
+		var start_s: int = int(act_data.get("start", 1))
+		var end_s: int = int(act_data.get("end", 10))
+		if s >= start_s and s <= end_s:
+			return act_data
+	return CLASSIC_ACTS[1]
+
+
+
+func _stage_type(s: int) -> String:
+	if game_mode == "classic":
+		if s == 10 or s == 20:
+			return "boss"
+		if s == 30:
+			return "final_boss"
+		if s % 4 == 3:
+			return "elite"
+		return "normal"
+	# infinite mode not implemented yet
+	return "normal"
+
+
 func _make_enemy_cfg(at_stage: int) -> Dictionary:
+	# --- base scaling ---
 	var budget := 16 + 2 * at_stage + int(0.5 * max(at_stage - 5, 0))
 	var depth: int = clamp(1 + int((at_stage - 1) / 3), 1, 4)
-	var noise: int = clamp(0.25 - 0.03 * at_stage, 0.05, 0.25)
+	var noise: float = clamp(0.25 - 0.03 * at_stage, 0.05, 0.25)
+
+	# --- stage meta ---
+	var stype: String = _stage_type(at_stage)
+	var act_data: Dictionary = _get_act_for_stage(at_stage)
+	var act_idx: int = int(act_data.get("act", 1))
+	var theme_str: String = String(act_data.get("theme", "Fields"))
+	var theme_key: String = theme_str.to_lower()
+
+	# --- ensure RNG for mutator selection ---
+	if rng == null:
+		rng = RandomNumberGenerator.new()
+		rng.seed = seed
+
+	var mutators: Array = []
+
+	if MUTATOR_POOL.has(theme_key):
+		var pool: Array = MUTATOR_POOL[theme_key]
+
+		match stype:
+			"elite":
+				if not pool.is_empty():
+					var idx := rng.randi_range(0, pool.size() - 1)
+					mutators.append(pool[idx])
+			"boss":
+				mutators = pool.duplicate()
+			"final_boss":
+				mutators = pool.duplicate()
+				mutators.append("mirror_reinforcements")
+				mutators.append("reinforced_king")
+			_:
+				pass
 
 	return {
 		"stage": at_stage,
+		"type": stype,
+		"act": act_idx,
+		"theme": theme_str,
+		"mutators": mutators,
 		"budget": budget,
 		"ai": {"depth": depth, "noise": noise}
 	}
 
+
+
+func proceed_to_draft() -> void:
+	if not run_active:
+		return
+	_change_scene(SCN_DRAFT)
 
 # -----------------------------
 #  LOAD JSON
@@ -322,6 +401,12 @@ func get_current_enemy_cfg() -> Dictionary:
 	if enemy_history.is_empty():
 		return _make_enemy_cfg(stage)
 	return enemy_history[enemy_history.size() - 1]
+	
+func get_next_enemy_cfg() -> Dictionary:
+	# Always returns the config for the upcoming enemy at the current stage.
+	# 'stage' is already advanced after rewards, so this is safe to use in Draft.
+	return _make_enemy_cfg(stage)
+
 
 # -----------------------------
 #  SCENE SWITCHING

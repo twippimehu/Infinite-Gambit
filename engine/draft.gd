@@ -84,7 +84,8 @@ func _ready() -> void:
 ]
 
 	_update_ui()
-	_set_info("Click a slot, then a piece.")
+	_update_info_text()
+
 
 
 # ---------------- helpers ----------------
@@ -108,6 +109,26 @@ func _highlight_slots() -> void:
 func _set_info(t: String) -> void:
 	if is_instance_valid(info_label):
 		info_label.text = t
+
+func _update_info_text() -> void:
+	var base := "Click a slot, then a piece."
+
+	# Only show enemy preview if we have the 'scout_ahead' upgrade
+	if has_node("/root/Game") and Game.has_upgrade("scout_ahead"):
+		var enemy_cfg: Dictionary = Game.get_next_enemy_cfg()
+		var stage_num: int = int(enemy_cfg.get("stage", Game.stage))
+		var budget: int = int(enemy_cfg.get("budget", 0))
+		var ai_cfg: Dictionary = enemy_cfg.get("ai", {})
+		var depth: int = int(ai_cfg.get("depth", 1))
+		var noise: float = float(ai_cfg.get("noise", 0.0))
+
+		var preview := "Next enemy (Stage %d): budget %d, AI depth %d, noise %.2f" \
+			% [stage_num, budget, depth, noise]
+
+		_set_info(preview + "\n" + base)
+	else:
+		_set_info(base)
+
 
 func _affordable_candidates(rem_gold: int, kinds: Array) -> Array:
 	var out: Array = []

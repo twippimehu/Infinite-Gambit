@@ -156,5 +156,4 @@ func _on_buy_pressed(idx: int) -> void:
 
 
 func _on_skip_pressed() -> void:
-	# leave shop and go to next battle
-	Game.proceed_to_battle()
+	Game.proceed_to_draft()

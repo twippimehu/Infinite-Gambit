@@ -2,6 +2,8 @@ extends Node2D
 
 const GameStateRes = preload("res://engine/state.gd")
 const PieceScene = preload("res://scenes/Piece.tscn")
+const ENEMY_COSTS := {"P":1, "N":3, "B":3, "R":5, "Q":9, "K":0}
+const PIECE_VALUES := {"P":1, "N":3, "B":3, "R":5, "Q":9, "K":100}
 
 var state: GameStateRes
 
@@ -40,6 +42,7 @@ var legal_targets: Array[Vector2i] = []
 var _sfx: Dictionary = {}
 var move_stack: Array = [] # {src,dst,piece,captured,captured_pos, promoted_to?, ep_marker}
 var last_double_pawn: Vector2i = Vector2i(-1, -1)
+var _rng: RandomNumberGenerator
 
 # AI
 @export var ai_plays_black := true
@@ -54,7 +57,14 @@ func _ready():
 	pieces_layer.z_index = 10
 	state = GameStateRes.new()
 
-	# Apply drafted layout (custom first rank)
+	# RNG for enemy generation
+	_rng = RandomNumberGenerator.new()
+	if has_node("/root/Game"):
+		_rng.seed = Game.seed + Game.stage * 10007
+	else:
+		_rng.randomize()
+
+	# Apply drafted layout (custom first rank) for the player (white)
 	if Game.army_layout.size() == 8:
 		for c in range(8):
 			state.board[0][c] = null
@@ -68,16 +78,58 @@ func _ready():
 				"has_moved": false
 			}
 
-	# Apply passive upgrades that modify the starting army
+	# Configure enemy army (black) based on current enemy config
+	_setup_enemy_army()
+
+	# Apply player upgrades that add extra starting units (white)
 	_apply_starting_unit_upgrades()
 
 	_spawn_all_pieces()
 	_update_status("White begins.")
+	_update_enemy_info()
 	_update_gold()
 	_update_upgrades_list()
 	_setup_tools_ui()
 	Game.reward_granted.connect(_on_reward_granted)
 
+
+func _evaluate_material() -> int:
+	var score := 0
+	for r in 8:
+		for c in 8:
+			var cell = state.board[r][c]
+			if cell == null:
+				continue
+			var val: int = int(PIECE_VALUES.get(cell.kind, 1))
+			if cell.side == 0:
+				score += val   # white material
+			else:
+				score -= val   # black material
+	return score
+
+func _update_enemy_info() -> void:
+	if not has_node("/root/Game"):
+		return
+
+	var cfg: Dictionary = Game.get_current_enemy_cfg()
+	var label_stage: Label = $RightPanel/VBox/Label_Stage
+	var rules_list: VBoxContainer = $RightPanel/VBox/RulesList
+
+	label_stage.text = "Stage %d (%s)" % [
+		cfg.get("stage", 0),
+		cfg.get("type", "normal").capitalize()
+	]
+
+	# Clear old rules
+	for child in rules_list.get_children():
+		child.queue_free()
+
+	# Add mutators
+	var muts: Array = cfg.get("mutators", [])
+	for m in muts:
+		var lbl := Label.new()
+		lbl.text = "• " + m.capitalize().replace("_", " ")
+		rules_list.add_child(lbl)
 
 func _on_reward_granted(id: String) -> void:
 	_update_upgrades_list()
@@ -206,6 +258,73 @@ func _find_piece_node_at(square: Vector2i) -> Node2D:
 		if p.position.distance_to(_board_to_pixels(square.x, square.y)) < 5.0:
 			return p
 	return null
+
+func _generate_enemy_back_rank_kinds(budget: int) -> Array[String]:
+	var slots: Array[String] = []
+	for i in range(8):
+		slots.append("")
+
+	if budget < 0:
+		budget = 0
+
+	# Ensure we have a king somewhere on the back rank
+	var king_pos: int = _rng.randi_range(0, 7)
+	slots[king_pos] = "K"
+
+	var remaining: int = budget
+
+	# Fill other squares based on remaining budget
+	for i in range(8):
+		if i == king_pos:
+			continue
+
+		# Build a list of affordable piece types
+		var candidates: Array[String] = []
+		for k in ["Q", "R", "B", "N", "P"]:
+			var cost: int = int(ENEMY_COSTS.get(k, 999))
+			if cost <= remaining:
+				candidates.append(k)
+
+		# Always allow empty (cost 0)
+		candidates.append("")
+
+		if candidates.is_empty():
+			slots[i] = ""
+			continue
+
+		var choice_index: int = _rng.randi_range(0, candidates.size() - 1)
+		var chosen: String = candidates[choice_index]
+		slots[i] = chosen
+
+		if chosen != "":
+			remaining -= int(ENEMY_COSTS.get(chosen, 0))
+			if remaining < 0:
+				remaining = 0
+
+	return slots
+
+func _setup_enemy_army() -> void:
+	if not has_node("/root/Game"):
+		return
+
+	var enemy_cfg: Dictionary = Game.get_current_enemy_cfg()
+	var budget: int = int(enemy_cfg.get("budget", 0))
+	if budget <= 0:
+		return
+
+	# Generate kinds for the black back rank (row 7)
+	var kinds: Array[String] = _generate_enemy_back_rank_kinds(budget)
+
+	for c in range(8):
+		var kind: String = kinds[c]
+		if kind == "":
+			state.board[7][c] = null
+		else:
+			state.board[7][c] = {
+				"kind": kind,
+				"side": 1,
+				"has_moved": false
+			}
 
 # -------------------------------------------------------------------
 # Piece setup
@@ -664,27 +783,84 @@ func _ai_collect_legal_moves(side: int) -> Array:
 						})
 	return moves
 
+func _ai_choose_move(moves: Array) -> Dictionary:
+	if moves.is_empty():
+		return {}
+
+	var depth := 1
+	var noise := 0.25
+
+	if has_node("/root/Game"):
+		var cfg: Dictionary = Game.get_current_enemy_cfg()
+		var ai_cfg: Dictionary = cfg.get("ai", {})
+		depth = int(ai_cfg.get("depth", 1))
+		noise = float(ai_cfg.get("noise", 0.25))
+
+	# Stronger enemies: less randomness (noise / depth)
+	var effective_noise: float = clamp(noise / float(max(depth, 1)), 0.02, 0.5)
+
+
+	# With some probability, pick a purely random legal move
+	if _rng.randf() < effective_noise:
+		return moves[_rng.randi_range(0, moves.size() - 1)]
+
+	# Otherwise, pick the move that gives the best material result for black
+	var best_moves: Array = []
+	var best_score := 999999
+
+	for m in moves:
+		var src: Vector2i = m["src"]
+		var dst: Vector2i = m["dst"]
+
+		# simulate move
+		var saved_src = state.board[src.x][src.y]
+		var saved_dst = state.board[dst.x][dst.y]
+		state.board[dst.x][dst.y] = saved_src
+		state.board[src.x][src.y] = null
+
+		var score := _evaluate_material()  # white - black
+
+		# undo simulation
+		state.board[src.x][src.y] = saved_src
+		state.board[dst.x][dst.y] = saved_dst
+
+		if score < best_score:
+			best_score = score
+			best_moves.clear()
+			best_moves.append(m)
+		elif score == best_score:
+			best_moves.append(m)
+
+	if best_moves.is_empty():
+		return moves[_rng.randi_range(0, moves.size() - 1)]
+
+	# if multiple equally good moves, pick one at random
+	return best_moves[_rng.randi_range(0, best_moves.size() - 1)]
+
 func _ai_move():
 	if _ai_thinking:
 		return
 	_ai_thinking = true
+
 	await get_tree().create_timer(0.25).timeout
+
 	var moves := _ai_collect_legal_moves(1)
 	if moves.is_empty():
 		_ai_thinking = false
 		return
-	var captures: Array = []
-	for m in moves:
-		if m.captured != null:
-			captures.append(m)
-	var pool := captures if not captures.is_empty() else moves
-	var choice = pool[randi() % pool.size()]
+
+	var choice: Dictionary = _ai_choose_move(moves)
+	if choice.is_empty():
+		_ai_thinking = false
+		return
+
 	_clear_highlights()
-	selected_square = choice.src
+	selected_square = choice["src"]
 	move_stage = 1
-	selected_piece_node = _find_piece_node_at(choice.src)
-	_try_move(choice.dst)
+	selected_piece_node = _find_piece_node_at(selected_square)
+	_try_move(choice["dst"])
 	_ai_thinking = false
+
 
 # -------------------------------------------------------------------
 # Undo

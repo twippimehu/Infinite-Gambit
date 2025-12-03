@@ -62,7 +62,6 @@ func _on_new_run() -> void:
 
 	Game.start_new_run()
 
-
 func _on_continue() -> void:
 	if Game.run_active:
 		Game.proceed_to_battle()

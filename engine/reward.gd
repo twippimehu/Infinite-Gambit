@@ -47,7 +47,7 @@ func _setup_buttons_with_choices() -> void:
 		if i < choices.size():
 			var ch: Dictionary = choices[i]
 			btn.disabled = false
-			btn.visible = true
+			btn.visible = true	
 			btn.text = String(ch.get("name", "Unknown reward"))
 			btn.tooltip_text = String(ch.get("desc", ""))
 			# connect to selection by index
