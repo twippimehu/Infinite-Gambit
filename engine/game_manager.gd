@@ -40,6 +40,8 @@ const MUTATOR_POOL := {
 	"ruins":   ["aggressive_ai"],
 	"citadel": ["queen_wall", "cold_precision"]
 }
+const CLASSIC_FINAL_STAGE := 30
+const SCN_VICTORY := "res://victory.tscn"
 
 
 func _ready() -> void:
@@ -157,11 +159,18 @@ func proceed_to_reward(_won: bool, _turns: int) -> void:
 			if board.has_method("_update_gold"):
 				board._update_gold()
 
-		_change_scene(SCN_REWARD)
+		# --- classic mode clear: winning at or beyond final stage ---
+		if stage >= CLASSIC_FINAL_STAGE:
+			print("DEBUG: Classic run cleared, going to Victory scene.")
+			run_active = false
+			_change_scene(SCN_VICTORY)
+		else:
+			# normal flow → reward draft then shop
+			_change_scene(SCN_REWARD)
 	else:
+		# defeat ends the run for now
 		run_active = false
 		_change_scene(SCN_MENU)
-
 
 func on_battle_end(won: bool, turns: int) -> void:
 	proceed_to_reward(won, turns)

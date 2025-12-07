@@ -512,7 +512,20 @@ func _setup_enemy_army() -> void:
 	if budget <= 0:
 		return
 
-	# Generate kinds for the black back rank (row 7)
+	var stype: String = String(enemy_cfg.get("type", "normal"))
+	var act_idx: int = int(enemy_cfg.get("act", 1))
+
+	# --- Act 1 Boss (Stage 10) custom layout ---
+	if stype == "boss" and act_idx == 1:
+		_setup_enemy_boss_10_layout()
+		return
+
+	# --- Act 2 Boss (Stage 20) custom layout ---
+	if stype == "boss" and act_idx == 2:
+		_setup_enemy_boss_20_layout()
+		return
+
+	# --- Generic enemy generation (non-boss) ---
 	var kinds: Array[String] = _generate_enemy_back_rank_kinds(budget)
 
 	for c in range(8):
@@ -525,6 +538,78 @@ func _setup_enemy_army() -> void:
 				"side": 1,
 				"has_moved": false
 			}
+
+
+func _setup_enemy_boss_10_layout() -> void:
+	# Clear the top three ranks for black's army (rows 5, 6, 7)
+	for r in [5, 6, 7]:
+		for c in range(8):
+			state.board[r][c] = null
+
+	# Back rank: standard heavy pieces
+	var back_rank: Array[String] = ["R", "N", "B", "Q", "K", "B", "N", "R"]
+	for c in range(8):
+		var kind: String = back_rank[c]
+		state.board[7][c] = {
+			"kind": kind,
+			"side": 1,
+			"has_moved": false
+		}
+
+	# Main pawn line: full rank of pawns on row 6
+	for c in range(8):
+		state.board[6][c] = {
+			"kind": "P",
+			"side": 1,
+			"has_moved": false
+		}
+
+	# Advanced pawn phalanx in the center on row 5 (files c–f)
+	for c in range(2, 6):
+		state.board[5][c] = {
+			"kind": "P",
+			"side": 1,
+			"has_moved": false
+		}
+
+func _setup_enemy_boss_20_layout() -> void:
+	# Clear the top three ranks for black's army (rows 5, 6, 7)
+	for r in [5, 6, 7]:
+		for c in range(8):
+			state.board[r][c] = null
+
+	# Back rank: more knight-heavy, rooks on corners
+	# Layout: R N B Q K B N R  (standard, but we’ll support knights with the next rank)
+	var back_rank: Array[String] = ["R", "N", "B", "Q", "K", "B", "N", "R"]
+	for c in range(8):
+		var kind: String = back_rank[c]
+		state.board[7][c] = {
+			"kind": kind,
+			"side": 1,
+			"has_moved": false
+		}
+
+	# Support rank on row 6:
+	# Knights on c/f, bishops on b/g, center opened (d/e empty) to encourage tactics.
+	var support_rank: Array[String] = ["", "B", "N", "", "", "N", "B", ""]
+	for c in range(8):
+		var k := support_rank[c]
+		if k == "":
+			continue
+		state.board[6][c] = {
+			"kind": k,
+			"side": 1,
+			"has_moved": false
+		}
+
+	# Front rank on row 5:
+	# Sparse pawn shield in front of the king & center (c–f files).
+	for c in range(2, 6):
+		state.board[5][c] = {
+			"kind": "P",
+			"side": 1,
+			"has_moved": false
+		}
 
 # -------------------------------------------------------------------
 # Piece setup
@@ -1232,6 +1317,5 @@ func _on_game_over(result: String) -> void:
 	if has_node("/root/Game"):
 		Game.on_battle_end(won, _get_turn_count())
 	else:
-		
 		push_warning("No Game singleton found. Result=%s turns=%d" % [result, _get_turn_count()])
 		print("DEBUG result:", result)
