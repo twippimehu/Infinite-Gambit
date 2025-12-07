@@ -147,7 +147,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.909804, 0.690196, 1)
 theme_override_fonts/font = ExtResource("3_nglv8")
 theme_override_font_sizes/font_size = 26
-text = "📜 Rules:"
+text = "📜 Mutators:"
 
 [node name="RulesList" type="VBoxContainer" parent="RightPanel/VBox"]
 layout_mode = 2

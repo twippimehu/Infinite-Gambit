@@ -28,6 +28,9 @@ var move_stage := 0
 var current_turn := 0 # 0 = white, 1 = black
 var game_over := false
 var game_over_reported := false
+var enemy_mutators: Array[String] = []
+var enemy_cold_precision_turns: int = 0
+var debug_window: Window = null
 
 # highlighting
 var highlight_sel_color := Color(1, 1, 0, 0.35)
@@ -81,6 +84,20 @@ func _ready():
 	# Configure enemy army (black) based on current enemy config
 	_setup_enemy_army()
 
+# Read enemy mutators from cfg
+	if has_node("/root/Game"):
+		var cfg: Dictionary = Game.get_current_enemy_cfg()
+		var raw_muts: Array = cfg.get("mutators", [])
+		enemy_mutators.clear()
+		for m in raw_muts:
+			enemy_mutators.append(String(m))
+	else:
+		enemy_mutators.clear()
+
+
+	# Apply enemy mutators that change the board layout / state
+	_apply_enemy_mutators_layout()
+
 	# Apply player upgrades that add extra starting units (white)
 	_apply_starting_unit_upgrades()
 
@@ -91,6 +108,100 @@ func _ready():
 	_update_upgrades_list()
 	_setup_tools_ui()
 	Game.reward_granted.connect(_on_reward_granted)
+
+func _toggle_debug_menu() -> void:
+	if debug_window and is_instance_valid(debug_window):
+		debug_window.visible = not debug_window.visible
+		return
+
+	debug_window = Window.new()
+	debug_window.title = "Debug"
+	debug_window.size = Vector2i(260, 230)
+	debug_window.position = Vector2i(40, 40)
+	add_child(debug_window)
+
+	var root := VBoxContainer.new()
+	root.anchor_right = 1.0
+	root.anchor_bottom = 1.0
+	root.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	root.grow_vertical = Control.GROW_DIRECTION_BOTH
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	debug_window.add_child(root)
+
+	# --- Stage controls ---
+	var h_stage := HBoxContainer.new()
+	root.add_child(h_stage)
+
+	var lbl_stage := Label.new()
+	lbl_stage.text = "Stage:"
+	h_stage.add_child(lbl_stage)
+
+	var stage_edit := LineEdit.new()
+	stage_edit.name = "StageEdit"
+	stage_edit.text = str(Game.stage)
+	stage_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	h_stage.add_child(stage_edit)
+
+	var btn_set_stage := Button.new()
+	btn_set_stage.text = "Set & Reload"
+	btn_set_stage.pressed.connect(func() -> void:
+		var s := int(stage_edit.text.to_int())
+		if s <= 0:
+			return
+		Game.stage = s
+		print("DEBUG: Jumping to stage", Game.stage)
+		Game.proceed_to_battle()
+	)
+	root.add_child(btn_set_stage)
+
+	# --- Gold controls ---
+	var h_gold := HBoxContainer.new()
+	root.add_child(h_gold)
+
+	var lbl_gold := Label.new()
+	lbl_gold.text = "Gold +50:"
+	h_gold.add_child(lbl_gold)
+
+	var btn_gold := Button.new()
+	btn_gold.text = "Add"
+	btn_gold.pressed.connect(func() -> void:
+		Game.gold += 50
+		print("DEBUG: Gold now", Game.gold)
+		_update_gold()
+	)
+	h_gold.add_child(btn_gold)
+
+	# --- AI toggle (debug) ---
+	var h_ai := HBoxContainer.new()
+	root.add_child(h_ai)
+
+	var chk_ai_dbg := CheckButton.new()
+	chk_ai_dbg.text = "AI plays black"
+	chk_ai_dbg.button_pressed = ai_plays_black
+	chk_ai_dbg.toggled.connect(func(v: bool) -> void:
+		ai_plays_black = v
+		# keep the main UI toggle in sync if it exists
+		if is_instance_valid(chk_ai):
+			chk_ai.button_pressed = v
+	)
+	h_ai.add_child(chk_ai_dbg)
+
+	# --- Undo button (debug) ---
+	var btn_undo_dbg := Button.new()
+	btn_undo_dbg.text = "Undo last move"
+	btn_undo_dbg.pressed.connect(undo_last_move)
+	root.add_child(btn_undo_dbg)
+
+	# --- Close button ---
+	var btn_close := Button.new()
+	btn_close.text = "Close"
+	btn_close.pressed.connect(func() -> void:
+		if debug_window and is_instance_valid(debug_window):
+			debug_window.visible = false
+	)
+	root.add_child(btn_close)
+
 
 
 func _evaluate_material() -> int:
@@ -106,6 +217,95 @@ func _evaluate_material() -> int:
 			else:
 				score -= val   # black material
 	return score
+
+func _apply_enemy_mutators_layout() -> void:
+	# Mirror Reinforcements:
+	# Copy the player's back rank (row 0, white pieces) as extra black pieces
+	# on row 5, in the same files, if those squares are empty.
+	if enemy_mutators.has("mirror_reinforcements"):
+		for c in range(8):
+			var src = state.board[0][c]
+			if src == null:
+				continue
+			if src.side != 0:
+				continue
+			var target_row := 5
+			if state.board[target_row][c] == null:
+				state.board[target_row][c] = {
+					"kind": src.kind,
+					"side": 1,
+					"has_moved": false
+				}
+
+	# Extra Pawns: add up to 2 extra advanced black pawns on rank 5
+	if enemy_mutators.has("extra_pawns"):
+		var added := 0
+		for c in range(8):
+			if added >= 2:
+				break
+			if state.board[5][c] == null:
+				state.board[5][c] = {
+					"kind": "P",
+					"side": 1,
+					"has_moved": false
+				}
+				added += 1
+
+	# Queen Wall: ensure at least 3 black queens by upgrading pawns/back-rank pieces
+	if enemy_mutators.has("queen_wall"):
+		var existing_q := 0
+		for r in 8:
+			for c in 8:
+				var cell = state.board[r][c]
+				if cell != null and cell.side == 1 and cell.kind == "Q":
+					existing_q += 1
+
+		var needed: int = maxi(0, 3 - existing_q)
+
+		# Promote some front pawns (rank 6) to queens first
+		for c in range(8):
+			if needed <= 0:
+				break
+			var cell2 = state.board[6][c]
+			if cell2 != null and cell2.side == 1:
+				state.board[6][c] = {"kind": "Q", "side": 1, "has_moved": false}
+				needed -= 1
+
+		# Then upgrade back-rank non-king pieces if still needed
+		for c in range(8):
+			if needed <= 0:
+				break
+			var cell3 = state.board[7][c]
+			if cell3 != null and cell3.side == 1 and cell3.kind != "K":
+				state.board[7][c] = {"kind": "Q", "side": 1, "has_moved": false}
+				needed -= 1
+
+	# Reinforced King:
+	# Place a small pawn fortress directly in front of the black king.
+	if enemy_mutators.has("reinforced_king"):
+		for c in range(8):
+			var k_cell = state.board[7][c]
+			if k_cell != null and k_cell.side == 1 and k_cell.kind == "K":
+				var king_col := c
+				var front_row := 6
+				for dc in [-1, 0, 1]:
+					var cc: int = king_col + dc
+					if cc < 0 or cc > 7:
+						continue
+					if state.board[front_row][cc] == null:
+						state.board[front_row][cc] = {
+							"kind": "P",
+							"side": 1,
+							"has_moved": false
+						}
+				break
+
+	# Cold Precision: enemy AI has 0 noise for the first few moves
+	if enemy_mutators.has("cold_precision"):
+		enemy_cold_precision_turns = 8
+	else:
+		enemy_cold_precision_turns = 0
+
 
 func _update_enemy_info() -> void:
 	if not has_node("/root/Game"):
@@ -348,6 +548,11 @@ func _spawn_all_pieces():
 # -------------------------------------------------------------------
 # Input
 func _input(event):
+		# DEBUG: toggle debug menu with F3
+	if event is InputEventKey and event.pressed and event.keycode == KEY_F3:
+		_toggle_debug_menu()
+		return
+
 	if game_over: return
 	if _ai_thinking: return
 	if current_turn == 1 and ai_plays_black: return
@@ -796,19 +1001,32 @@ func _ai_choose_move(moves: Array) -> Dictionary:
 		depth = int(ai_cfg.get("depth", 1))
 		noise = float(ai_cfg.get("noise", 0.25))
 
-	# Stronger enemies: less randomness (noise / depth)
-	var effective_noise: float = clamp(noise / float(max(depth, 1)), 0.02, 0.5)
+	# --- Aggressive AI: if available, only consider capturing moves ---
+	var candidate_moves: Array = moves
+	if enemy_mutators.has("aggressive_ai"):
+		var captures: Array = []
+		for m in moves:
+			if m.get("captured") != null:
+				captures.append(m)
+		if not captures.is_empty():
+			candidate_moves = captures
 
+	# Stronger enemies: less randomness (noise / depth)
+	var effective_noise: float = clampf(noise / float(max(depth, 1)), 0.02, 0.5)
+
+	# Cold Precision: zero randomness for the first few AI moves
+	if enemy_mutators.has("cold_precision") and enemy_cold_precision_turns > 0:
+		effective_noise = 0.0
 
 	# With some probability, pick a purely random legal move
 	if _rng.randf() < effective_noise:
-		return moves[_rng.randi_range(0, moves.size() - 1)]
+		return candidate_moves[_rng.randi_range(0, candidate_moves.size() - 1)]
 
 	# Otherwise, pick the move that gives the best material result for black
 	var best_moves: Array = []
 	var best_score := 999999
 
-	for m in moves:
+	for m in candidate_moves:
 		var src: Vector2i = m["src"]
 		var dst: Vector2i = m["dst"]
 
@@ -832,10 +1050,10 @@ func _ai_choose_move(moves: Array) -> Dictionary:
 			best_moves.append(m)
 
 	if best_moves.is_empty():
-		return moves[_rng.randi_range(0, moves.size() - 1)]
+		return candidate_moves[_rng.randi_range(0, candidate_moves.size() - 1)]
 
-	# if multiple equally good moves, pick one at random
 	return best_moves[_rng.randi_range(0, best_moves.size() - 1)]
+
 
 func _ai_move():
 	if _ai_thinking:
@@ -859,7 +1077,12 @@ func _ai_move():
 	move_stage = 1
 	selected_piece_node = _find_piece_node_at(selected_square)
 	_try_move(choice["dst"])
+
+	if enemy_cold_precision_turns > 0:
+		enemy_cold_precision_turns -= 1
+
 	_ai_thinking = false
+
 
 
 # -------------------------------------------------------------------

@@ -36,9 +36,9 @@ const SCN_BOARD  := "res://scenes/board.tscn"
 const SCN_REWARD := "res://scenes/reward.tscn"
 const SCN_SHOP   := "res://scenes/shop.tscn"
 const MUTATOR_POOL := {
-	"fields": ["extra_pawns", "wide_rooks"],
-	"ruins":  ["reinforced_king", "aggressive_ai"],
-	"citadel":["queen_wall", "cold_precision"]
+	"fields":  ["extra_pawns"],
+	"ruins":   ["aggressive_ai"],
+	"citadel": ["queen_wall", "cold_precision"]
 }
 
 
@@ -72,7 +72,7 @@ func start_new_run(_seed: int = Time.get_unix_time_from_system(), mode: String =
 	rng.seed = seed
 
 	run_active = true
-	stage = 1
+	stage = 0
 	wins = 0
 	gold = 0
 	upgrades.clear()
@@ -344,19 +344,24 @@ func _make_enemy_cfg(at_stage: int) -> Dictionary:
 	if MUTATOR_POOL.has(theme_key):
 		var pool: Array = MUTATOR_POOL[theme_key]
 
-		match stype:
-			"elite":
-				if not pool.is_empty():
-					var idx := rng.randi_range(0, pool.size() - 1)
-					mutators.append(pool[idx])
-			"boss":
-				mutators = pool.duplicate()
-			"final_boss":
-				mutators = pool.duplicate()
-				mutators.append("mirror_reinforcements")
-				mutators.append("reinforced_king")
-			_:
-				pass
+		if not pool.is_empty():
+			match stype:
+				"elite":
+					# In Act 3, elites use ALL mutators (Queen Wall + Cold Precision)
+					if act_idx == 3:
+						mutators = pool.duplicate()
+					else:
+						# Act 1 & 2 elites: single random mutator
+						var idx := rng.randi_range(0, pool.size() - 1)
+						mutators.append(pool[idx])
+				"boss":
+					mutators = pool.duplicate()
+				"final_boss":
+					mutators = pool.duplicate()
+					mutators.append("mirror_reinforcements")
+					mutators.append("reinforced_king")
+				_:
+					pass
 
 	return {
 		"stage": at_stage,
@@ -367,6 +372,7 @@ func _make_enemy_cfg(at_stage: int) -> Dictionary:
 		"budget": budget,
 		"ai": {"depth": depth, "noise": noise}
 	}
+
 
 
 
