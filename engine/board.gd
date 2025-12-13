@@ -227,15 +227,28 @@ func _apply_enemy_mutators_layout() -> void:
 			var src = state.board[0][c]
 			if src == null:
 				continue
-			if src.side != 0:
+			if src.side != 0:  # Ensure it’s a white piece
 				continue
-			var target_row := 5
-			if state.board[target_row][c] == null:
-				state.board[target_row][c] = {
-					"kind": src.kind,
-					"side": 1,
-					"has_moved": false
-				}
+
+			# Prevent placing a second king, we only want one king on row 7
+			if src.kind == "K":
+				# Place the king ONLY on row 7 if it’s not there already
+				if state.board[7][c] == null:
+					state.board[7][c] = {
+						"kind": "K",
+						"side": 1,
+						"has_moved": false
+					}
+			else:
+				# Copy non-king pieces to row 5
+				if state.board[5][c] == null:
+					state.board[5][c] = {
+						"kind": src.kind,
+						"side": 1,
+						"has_moved": false
+					}
+
+
 
 	# Extra Pawns: add up to 2 extra advanced black pawns on rank 5
 	if enemy_mutators.has("extra_pawns"):
@@ -610,6 +623,47 @@ func _setup_enemy_boss_20_layout() -> void:
 			"side": 1,
 			"has_moved": false
 		}
+
+
+func _setup_enemy_boss_30_layout() -> void:
+	# Clear the top three ranks for black's army (rows 5, 6, 7)
+	for r in [5, 6, 7]:
+		for c in range(8):
+			state.board[r][c] = null
+
+	# Back rank: standard heavy pieces
+	var back_rank: Array[String] = ["R", "N", "B", "Q", "K", "B", "N", "R"]
+	for c in range(8):
+		var kind: String = back_rank[c]
+		state.board[7][c] = {
+			"kind": kind,
+			"side": 1,
+			"has_moved": false
+		}
+
+	# Mirror back rank: Copy player’s back rank (row 0) to enemy (row 5)
+	# But we need to make sure there’s only ONE king on row 7
+	var king_col: int = -1  # Track the column where the king is placed
+	for c in range(8):
+		var src = state.board[0][c]
+		if src == null or src.kind != "K":
+			continue
+		# Found the king in row 0
+		king_col = c
+		# Place the king only on row 7 (if it's not already there)
+		if state.board[7][king_col] == null:
+			state.board[7][king_col] = {
+				"kind": "K",
+				"side": 1,
+				"has_moved": false
+			}
+
+	# Remove the king from row 6 if it tries to duplicate
+	if king_col != -1:
+		state.board[6][king_col] = null
+
+
+
 
 # -------------------------------------------------------------------
 # Piece setup

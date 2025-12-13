@@ -1,5 +1,7 @@
 extends Control
 
+
+@onready var panel: Panel          = $Panel
 @onready var lbl_title: Label      = $Panel/VBoxContainer/Label_Title
 @onready var lbl_stats: Label      = $Panel/VBoxContainer/Label_Stats
 @onready var lbl_upgrades: Label   = $Panel/VBoxContainer/Label_Upgrades
@@ -10,6 +12,14 @@ extends Control
 
 
 func _ready() -> void:
+	_populate_text()
+	_play_intro_animation()
+
+	# Hook up buttons
+	btn_new_run.pressed.connect(_on_new_run_pressed)
+	btn_menu.pressed.connect(_on_menu_pressed)
+
+func _populate_text() -> void:
 	# Title
 	lbl_title.text = "CLASSIC MODE CLEARED!"
 
@@ -32,9 +42,16 @@ func _ready() -> void:
 			lines.append(" • " + Game.get_upgrade_name(id))
 		lbl_upgrades.text = "\n".join(lines)
 
-	# Hook up buttons
-	btn_new_run.pressed.connect(_on_new_run_pressed)
-	btn_menu.pressed.connect(_on_menu_pressed)
+func _play_intro_animation() -> void:
+	# Start slightly transparent and scaled down
+	panel.modulate.a = 0.0
+	panel.scale = Vector2(0.9, 0.9)
+
+	var t := create_tween()
+	t.tween_property(panel, "modulate:a", 1.0, 0.25)
+	t.parallel().tween_property(panel, "scale", Vector2.ONE, 0.25) \
+		.set_trans(Tween.TRANS_BACK) \
+		.set_ease(Tween.EASE_OUT)
 
 
 func _on_new_run_pressed() -> void:
